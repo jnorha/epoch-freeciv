@@ -1,0 +1,75 @@
+{
+  "title": "Epoch — Game Telemetry",
+  "uid": "epoch-game",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "60s",
+  "time": { "from": "now-6h", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Era Transitions (all players)",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 0, "w": 12, "h": 6 },
+      "targets": [
+        {
+          "datasource": { "uid": "epoch-prometheus" },
+          "expr": "increase(epoch_era_transitions_total[5m])",
+          "legendFormat": "{{era}}"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Special Actions — Success Rate",
+      "type": "bargauge",
+      "gridPos": { "x": 12, "y": 0, "w": 12, "h": 6 },
+      "targets": [
+        {
+          "datasource": { "uid": "epoch-prometheus" },
+          "expr": "rate(epoch_special_action_success_total[1h]) / rate(epoch_special_action_attempts_total[1h])",
+          "legendFormat": "{{action}}"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Public Works Spend (per turn)",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 6, "w": 12, "h": 6 },
+      "targets": [
+        {
+          "datasource": { "uid": "epoch-prometheus" },
+          "expr": "rate(epoch_pw_points_spent_total[5m])",
+          "legendFormat": "{{improvement}}"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Turn Duration (ms)",
+      "type": "timeseries",
+      "gridPos": { "x": 12, "y": 6, "w": 12, "h": 6 },
+      "targets": [
+        {
+          "datasource": { "uid": "epoch-prometheus" },
+          "expr": "epoch_turn_duration_ms",
+          "legendFormat": "{{game_id}}"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Game Events Log",
+      "type": "logs",
+      "gridPos": { "x": 0, "y": 12, "w": 24, "h": 10 },
+      "targets": [
+        {
+          "datasource": { "uid": "epoch-loki" },
+          "expr": "{epoch_plane=\"game\"} | json | line_format \"[{{.game_id}}] {{.event}} — {{.message}}\"",
+          "legendFormat": ""
+        }
+      ]
+    }
+  ]
+}

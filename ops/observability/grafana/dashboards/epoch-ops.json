@@ -1,0 +1,88 @@
+{
+  "title": "Epoch — Ops",
+  "uid": "epoch-ops",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "30s",
+  "time": { "from": "now-1h", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Active Game Servers",
+      "type": "stat",
+      "gridPos": { "x": 0, "y": 0, "w": 4, "h": 4 },
+      "targets": [
+        {
+          "datasource": { "uid": "epoch-prometheus" },
+          "expr": "epoch_active_game_servers",
+          "legendFormat": "servers"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "WebSocket Connections",
+      "type": "timeseries",
+      "gridPos": { "x": 4, "y": 0, "w": 8, "h": 4 },
+      "targets": [
+        {
+          "datasource": { "uid": "epoch-prometheus" },
+          "expr": "epoch_websocket_connections_active",
+          "legendFormat": "active WS"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Server Crashes / Restarts",
+      "type": "stat",
+      "gridPos": { "x": 12, "y": 0, "w": 4, "h": 4 },
+      "targets": [
+        {
+          "datasource": { "uid": "epoch-prometheus" },
+          "expr": "increase(epoch_server_crashes_total[1h])",
+          "legendFormat": "crashes (1h)"
+        }
+      ],
+      "options": { "colorMode": "background" },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 1 },
+              { "color": "red", "value": 3 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 4,
+      "title": "Container CPU %",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 4, "w": 8, "h": 6 },
+      "targets": [
+        {
+          "datasource": { "uid": "epoch-prometheus" },
+          "expr": "rate(process_cpu_seconds_total[2m]) * 100",
+          "legendFormat": "{{job}}"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Ops Logs",
+      "type": "logs",
+      "gridPos": { "x": 0, "y": 10, "w": 24, "h": 8 },
+      "targets": [
+        {
+          "datasource": { "uid": "epoch-loki" },
+          "expr": "{epoch_plane=\"ops\"} | json",
+          "legendFormat": ""
+        }
+      ]
+    }
+  ]
+}

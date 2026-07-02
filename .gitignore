@@ -81,3 +81,15 @@ tests/screenshot*.png
 .freeciv_index
 .idea
 *.iml
+
+# Epoch — secrets and local overrides
+.env
+ops/observability/grafana/data/
+ops/observability/data/
+
+# Epoch — art pipeline intermediates
+tools/art/output/
+tools/art/*.tmp
+
+# Epoch — generated tileset spritesheets (binaries, tracked separately via LFS if needed)
+tileset/epoch/*.png

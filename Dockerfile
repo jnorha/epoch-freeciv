@@ -41,6 +41,10 @@ COPY music /docker/music
 COPY blender /docker/blender
 COPY config /docker/config
 
+## Epoch custom content
+COPY data /docker/data
+COPY tileset /docker/tileset
+
 RUN chown -R docker:docker /docker
 
 USER docker
@@ -57,6 +61,14 @@ RUN DEBIAN_FRONTEND=noninteractive sudo apt-get update --yes --quiet && \
 ## Give server access to savegames / scenarios directory.
 ## TODO: Figure out more targeted solution.
 RUN sudo adduser docker tomcat
+
+## Install Epoch custom ruleset and tilesets into the compiled freeciv share directory
+RUN mkdir -p ${HOME}/freeciv/share/freeciv && \
+    cp -r /docker/data/epoch ${HOME}/freeciv/share/freeciv/epoch && \
+    if [ -d /docker/tileset/epoch ]; then \
+        mkdir -p ${HOME}/freeciv/share/freeciv/tilesets && \
+        cp -r /docker/tileset/epoch ${HOME}/freeciv/share/freeciv/tilesets/epoch; \
+    fi
 
 COPY docker-entrypoint.sh /docker/docker-entrypoint.sh
 

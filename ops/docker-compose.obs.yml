@@ -1,0 +1,82 @@
+# Epoch observability overlay
+# Usage: docker-compose -f ../docker-compose.yml -f docker-compose.obs.yml up -d
+# (run from ops/ directory, or adjust paths accordingly)
+#
+# Stack: OTel Collector → Prometheus (metrics) + Loki (logs) → Grafana (dashboards/alerts)
+
+version: "3.8"
+
+services:
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.103.0
+    container_name: epoch-otel-collector
+    restart: unless-stopped
+    volumes:
+      - ./observability/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml:ro
+    ports:
+      - "4317:4317"    # gRPC OTLP
+      - "4318:4318"    # HTTP OTLP
+      - "8888:8888"    # collector self-metrics (Prometheus scrape)
+    networks:
+      - epoch-obs
+
+  prometheus:
+    image: prom/prometheus:v2.52.0
+    container_name: epoch-prometheus
+    restart: unless-stopped
+    volumes:
+      - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=30d"
+      - "--web.enable-lifecycle"
+    ports:
+      - "9090:9090"
+    networks:
+      - epoch-obs
+
+  loki:
+    image: grafana/loki:3.0.0
+    container_name: epoch-loki
+    restart: unless-stopped
+    volumes:
+      - ./observability/loki-config.yaml:/etc/loki/local-config.yaml:ro
+      - loki-data:/loki
+    command: -config.file=/etc/loki/local-config.yaml
+    ports:
+      - "3100:3100"
+    networks:
+      - epoch-obs
+
+  grafana:
+    image: grafana/grafana:11.0.0
+    container_name: epoch-grafana
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-epoch-change-me}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SERVER_ROOT_URL=http://localhost:3000
+    volumes:
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - epoch-obs
+    depends_on:
+      - prometheus
+      - loki
+
+networks:
+  epoch-obs:
+    driver: bridge
+
+volumes:
+  prometheus-data:
+  loki-data:
+  grafana-data:

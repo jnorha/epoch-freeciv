@@ -1,0 +1,100 @@
+# OpenTelemetry Collector — Epoch
+#
+# Receives OTLP from instrumented services (freeciv-proxy, publite2, Lua server output)
+# Exports: metrics → Prometheus, logs → Loki
+#
+# Telemetry planes:
+#   ops:  container health, nginx 5xx, WS connection counts, crash/restart events
+#   game: turn events, era transitions, special-action attempts/success, PW spend, victory
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+  # Scrape the collector's own internal metrics
+  prometheus:
+    config:
+      scrape_configs:
+        - job_name: otel-collector
+          scrape_interval: 30s
+          static_configs:
+            - targets: [localhost:8888]
+
+  # Scrape nginx stub_status (enable in nginx config)
+  # prometheus/nginx:
+  #   config:
+  #     scrape_configs:
+  #       - job_name: nginx
+  #         static_configs:
+  #           - targets: [freeciv-web:9113]   # nginx-prometheus-exporter
+
+processors:
+  batch:
+    timeout: 5s
+    send_batch_size: 1024
+
+  # Add epoch version label to all telemetry
+  attributes/epoch_version:
+    actions:
+      - key: epoch.version
+        value: "0.1.0"
+        action: insert
+
+  # Separate game-plane logs (tagged with game.event attribute) from ops logs
+  filter/game_plane:
+    logs:
+      include:
+        match_type: strict
+        resource_attributes:
+          - key: epoch.plane
+            value: game
+
+  filter/ops_plane:
+    logs:
+      exclude:
+        match_type: strict
+        resource_attributes:
+          - key: epoch.plane
+            value: game
+
+exporters:
+  prometheusremotewrite:
+    endpoint: "http://prometheus:9090/api/v1/write"
+    tls:
+      insecure: true
+
+  loki:
+    endpoint: "http://loki:3100/loki/api/v1/push"
+    default_labels_enabled:
+      exporter: false
+      job: true
+    labels:
+      resource:
+        - epoch.plane
+        - service.name
+        - game.id
+
+  # Debug: uncomment to see all telemetry in collector logs
+  # debug:
+  #   verbosity: detailed
+
+service:
+  pipelines:
+    metrics:
+      receivers: [otlp, prometheus]
+      processors: [attributes/epoch_version, batch]
+      exporters: [prometheusremotewrite]
+
+    logs/game:
+      receivers: [otlp]
+      processors: [attributes/epoch_version, filter/game_plane, batch]
+      exporters: [loki]
+
+    logs/ops:
+      receivers: [otlp]
+      processors: [attributes/epoch_version, filter/ops_plane, batch]
+      exporters: [loki]

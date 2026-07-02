@@ -1,0 +1,35 @@
+# Prometheus scrape config — Epoch
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    project: epoch
+
+rule_files:
+  - "alert_rules/*.yml"
+
+scrape_configs:
+  # OTel collector self-metrics (also a RemoteWrite target above, but scrape for redundancy)
+  - job_name: otel-collector
+    static_configs:
+      - targets: [otel-collector:8888]
+
+  # Prometheus self-scrape
+  - job_name: prometheus
+    static_configs:
+      - targets: [localhost:9090]
+
+  # Loki metrics
+  - job_name: loki
+    static_configs:
+      - targets: [loki:3100]
+
+  # freeciv-proxy WebSocket stats (when OTel SDK added to proxy)
+  # - job_name: freeciv-proxy
+  #   static_configs:
+  #     - targets: [freeciv-web:8889]
+
+  # Publite2 server-instance lifecycle metrics (when OTel added to publite2)
+  # - job_name: publite2
+  #   static_configs:
+  #     - targets: [freeciv-web:8890]
