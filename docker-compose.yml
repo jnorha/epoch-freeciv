@@ -1,4 +1,3 @@
-version: "3"
 services:
 
   freeciv-web:
@@ -15,6 +14,15 @@ services:
       - "7000-7009:7000-7009"
       - "8888:8080"
     user: docker
+    # Lightweight, always-on troubleshooting log (Phase 0.5's full observability
+    # stack is paused for now -- see ops/. This just keeps `docker logs freeciv-web`
+    # bounded so it can't fill the disk). Capped at ~5MB; also wiped daily by
+    # scripts/epoch-log-wipe.sh via cron as a belt-and-suspenders reset.
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "1"
 
 volumes:
   data:
