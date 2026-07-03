@@ -54,6 +54,7 @@ services:
       - "--storage.tsdb.path=/prometheus"
       - "--storage.tsdb.retention.time=30d"
       - "--web.enable-lifecycle"
+      - "--web.enable-remote-write-receiver"   # required for the OTel collector's prometheusremotewrite exporter
     ports:
       - "127.0.0.1:9090:9090"
     networks:
