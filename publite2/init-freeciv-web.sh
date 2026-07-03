@@ -50,7 +50,11 @@ if [ "$5" = "longturn" ]; then
     fi
   fi
 else
-  addArgs --quitidle 20
+  # Epoch: raised from 20s to 600s. At 20s, idle pool servers churn constantly,
+  # which drives publite2 to over-spawn launchers up to server_limit (a 14GB
+  # process leak on an idle box). 600s keeps the pool stable while still cleaning
+  # up genuinely abandoned games. See doc/design/publite2-pool-tuning.md.
+  addArgs --quitidle 600
 fi
 addArgs --saves "${savesdir}" --scenarios "${savesdir}"
 
