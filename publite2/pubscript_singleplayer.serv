@@ -1,5 +1,8 @@
 read web.serv
 
+# Epoch: launch games on our custom ruleset (rulesetdir is a command, not a `set`).
+rulesetdir epoch
+
 mapimg define 'zoom=2:map=tcub:turns=5:format=png'
 cmdlevel ctrl first
 set topology ""
