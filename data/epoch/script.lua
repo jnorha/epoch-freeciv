@@ -377,13 +377,127 @@ signal.connect("map_generated", "place_map_labels")
 -- else builds on a green baseline.
 -- ============================================================
 
--- Runs at ruleset load time.
 log.normal("[EPOCH] Epoch ruleset script loaded (baseline).")
 
--- Turn hook smoke test. If the signal name/signature is wrong for this build,
--- the autogame log will show it and we correct from there.
+-- ------------------------------------------------------------
+-- Era system (Slice 0) — bucket-membership detection.
+-- Design: doc/design/epoch-tech-tree.md §2. A player's age = the highest age
+-- of any tech they know (research, trade, theft, conquest all count). Monotonic.
+-- Ages IV/V (Helix/Lattice) get their techs in later slices; the table below is
+-- ages I–III over the existing 87 techs.
+-- All Lua API here verified against this build (tech_researched(tech,player,how),
+-- find.tech_type, players_iterate, player:knows_tech, notify.event/E.TECH_GAIN).
+-- ------------------------------------------------------------
+
+EPOCH_ERAS = {
+  [1] = { id = "ember",   label = "The Ember Age" },
+  [2] = { id = "compass", label = "The Compass Age" },
+  [3] = { id = "dynamo",  label = "The Dynamo Age" },
+  [4] = { id = "helix",   label = "The Helix Age" },
+  [5] = { id = "lattice", label = "The Lattice Age" },
+}
+
+-- tech (rule) name -> age number. Single source of truth for era buckets.
+EPOCH_TECH_AGE = {
+  -- Age I — Ember (26)
+  ["Alphabet"]=1, ["Pottery"]=1, ["Masonry"]=1, ["Bronze Working"]=1,
+  ["Ceremonial Burial"]=1, ["Horseback Riding"]=1, ["Warrior Code"]=1,
+  ["The Wheel"]=1, ["Writing"]=1, ["Code of Laws"]=1, ["Mysticism"]=1,
+  ["Map Making"]=1, ["Currency"]=1, ["Iron Working"]=1, ["Mathematics"]=1,
+  ["Polytheism"]=1, ["Trade"]=1, ["Seafaring"]=1, ["Construction"]=1,
+  ["Bridge Building"]=1, ["Literacy"]=1, ["Monarchy"]=1, ["Philosophy"]=1,
+  ["The Republic"]=1, ["Astronomy"]=1, ["Medicine"]=1,
+  -- Age II — Compass (17)
+  ["Feudalism"]=2, ["Chivalry"]=2, ["Monotheism"]=2, ["Theology"]=2,
+  ["University"]=2, ["Invention"]=2, ["Gunpowder"]=2, ["Banking"]=2,
+  ["Navigation"]=2, ["Physics"]=2, ["Magnetism"]=2, ["Theory of Gravity"]=2,
+  ["Leadership"]=2, ["Metallurgy"]=2, ["Chemistry"]=2, ["Economics"]=2,
+  ["Democracy"]=2,
+  -- Age III — Dynamo (44 existing; Networked Computing added in a later slice)
+  ["Steam Engine"]=3, ["Railroad"]=3, ["Industrialization"]=3,
+  ["The Corporation"]=3, ["Sanitation"]=3, ["Explosives"]=3, ["Refining"]=3,
+  ["Electricity"]=3, ["Engineering"]=3, ["Steel"]=3, ["Conscription"]=3,
+  ["Tactics"]=3, ["Machine Tools"]=3, ["Combustion"]=3, ["Automobile"]=3,
+  ["Mass Production"]=3, ["Refrigeration"]=3, ["Atomic Theory"]=3,
+  ["Electronics"]=3, ["Radio"]=3, ["Flight"]=3, ["Advanced Flight"]=3,
+  ["Mobile Warfare"]=3, ["Combined Arms"]=3, ["Amphibious Warfare"]=3,
+  ["Guerilla Warfare"]=3, ["Espionage"]=3, ["Communism"]=3, ["Labor Union"]=3,
+  ["Nuclear Fission"]=3, ["Nuclear Power"]=3, ["Miniaturization"]=3,
+  ["Computers"]=3, ["Rocketry"]=3, ["Space Flight"]=3, ["Laser"]=3,
+  ["Superconductors"]=3, ["Robotics"]=3, ["Plastics"]=3, ["Stealth"]=3,
+  ["Recycling"]=3, ["Environmentalism"]=3, ["Genetic Engineering"]=3,
+  ["Fusion Power"]=3,
+}
+
+-- Resolved lookups, built lazily (find.tech_type is safe once rules are loaded).
+local epoch_age_by_techid = nil   -- tech.id -> age
+local epoch_tech_list = nil       -- array of { tt = Tech_Type, age = n }
+local epoch_player_era = {}       -- player.id -> age (nil => age 1)
+local epoch_current_turn = 0
+
+local function epoch_build_maps()
+  epoch_age_by_techid = {}
+  epoch_tech_list = {}
+  local missing = 0
+  for name, age in pairs(EPOCH_TECH_AGE) do
+    local tt = find.tech_type(name)
+    if tt ~= nil then
+      epoch_age_by_techid[tt.id] = age
+      epoch_tech_list[#epoch_tech_list + 1] = { tt = tt, age = age }
+    else
+      missing = missing + 1
+      log.error("[EPOCH] tech->age map: unknown tech name '" .. name .. "'")
+    end
+  end
+  log.normal("[EPOCH] tech->age map built: " .. tostring(#epoch_tech_list)
+             .. " techs, " .. tostring(missing) .. " unmatched.")
+end
+
+local function epoch_get_era(player)
+  return epoch_player_era[player.id] or 1
+end
+
+-- Raise a player's era to new_age if higher. Monotonic; announces + logs a
+-- structured era_transition line (the telemetry event; goes to the bounded
+-- game log for now, to Loki once observability is back on).
+local function epoch_set_era(player, new_age, trigger)
+  local old = epoch_get_era(player)
+  if new_age <= old then return end
+  epoch_player_era[player.id] = new_age
+  local era = EPOCH_ERAS[new_age]
+  log.normal(string.format(
+    "[EPOCH][era_transition] player_id=%d from=%d to=%d (%s) turn=%d trigger=%s",
+    player.id, old, new_age, era.id, epoch_current_turn, tostring(trigger)))
+  notify.event(player, NIL, E.TECH_GAIN,
+    _("Your civilization enters %s."), era.label)
+end
+
+-- Primary path: fires on any tech acquisition (research/trade/theft/conquest).
+function epoch_tech_researched(tech, player, how)
+  if tech == nil then return end
+  if epoch_age_by_techid == nil then epoch_build_maps() end
+  local age = epoch_age_by_techid[tech.id]
+  if age ~= nil then
+    epoch_set_era(player, age, tech:name_translation())
+  end
+end
+signal.connect("tech_researched", "epoch_tech_researched")
+
+-- Safety-net rescan (Lua state doesn't survive save/load): recompute each
+-- player's era from their known techs. Cheap (bounded tech list x players).
 function epoch_turn_begin(turn, year)
+  epoch_current_turn = turn
   log.normal("[EPOCH] turn_begin fired: turn=" .. tostring(turn)
              .. " year=" .. tostring(year))
+  if epoch_tech_list == nil then epoch_build_maps() end
+  for player in players_iterate() do
+    local maxage = epoch_get_era(player)
+    for _, entry in ipairs(epoch_tech_list) do
+      if entry.age > maxage and player:knows_tech(entry.tt) then
+        maxage = entry.age
+      end
+    end
+    epoch_set_era(player, maxage, "rescan")
+  end
 end
 signal.connect("turn_begin", "epoch_turn_begin")
