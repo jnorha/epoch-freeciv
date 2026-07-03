@@ -1,6 +1,11 @@
 # publite2 server-pool tuning (and the idle process-leak fix)
 
-**Status:** fixed at source 2026-07-02. Applies to Phase 0 platform hardening.
+**Status:** ~~fixed at source 2026-07-02~~ **REOPENED and fixed FOR REAL 2026-07-03** — the
+2026-07-02 tuning reduced the leak *rate* but not the *mechanism*; the pool ratcheted to 24
+launchers in ~19h and (pre-tuning) to 260, wedging WSL2 so hard a VM force-kill was needed.
+See **"2026-07-03: the actual fix"** at the bottom. The 07-02 analysis below is kept for
+history; its "Startup overshoot (known, bounded, acceptable)" section was **wrong** — that
+overshoot was the unbounded ratchet itself.
 
 ## Symptom
 
@@ -101,3 +106,55 @@ for immediate effect without a 20-min rebuild.
   addresses our use case.
 - When the observability stack comes back, a `freeciv-web` process-count metric with an
   alert threshold (say > 8) would catch any regression of this immediately.
+
+---
+
+## 2026-07-03: the actual fix (the 07-02 tuning was not sufficient)
+
+**What happened:** ~19h after the tuning above, the local container had ratcheted to **24
+launchers** (ports 6000–6023) despite `server_limit = 6` in the *live, verified-correct*
+`settings.ini`. The pileup eventually wedged the container beyond `docker kill`, wedged WSL2
+beyond `wsl --shutdown`, and required force-killing the WSL VM. The tuning had only slowed
+the ratchet (600s churn window instead of 20s); the mechanism was intact.
+
+**Why `server_limit` never engaged — the real bug in `publite2.py`:** the spawn loops gated
+on `self.total`/`self.single`/`self.multi`, which are overwritten every 40s cycle **from the
+metaserver** — a lagging, flapping external count of *available pregame* servers:
+
+- A freshly spawned server takes seconds to boot and register → during that window the
+  metaserver count is low → publite2 spawns another launcher on the next port.
+- Every `--quitidle` recycle deregisters/re-registers a server → another lag window each
+  10 minutes, forever → +1 launcher each time.
+- `Civlauncher.run()` is `while 1:` — **immortal**; every launcher ever created respawns its
+  server forever and `server_list` was append-only. Extras never "self-correct away"
+  (the 07-02 "startup overshoot… self-corrects" claim above was wrong: quitidle kills the
+  *server process*, and its immortal launcher instantly respawns it — launchers never die).
+- `server_limit` was compared against the metaserver total, **never** against the actual
+  launcher count. The only `len(server_list)` check (`fork_bomb_preventer`) requires the
+  metaserver to report **zero** servers — unreachable during a slow ratchet.
+
+**The fix (in our fork's `publite2.py`):**
+1. Spawn loops now gate on **publite2's own live launcher list** — per-type counts from
+   `server_list`, with dead threads pruned (`is_alive()`) — not on metaserver counts. The
+   metaserver numbers remain for status display only.
+2. `server_limit` is now enforced as `len(server_list) < server_limit` — a real hard cap on
+   actual launcher processes.
+3. Startup no longer spawns launchers for game types with capacity 0 (previously an
+   unconditional one-per-type, which is why an unused pbem server always ran).
+4. **Semantic change, documented in `settings.ini.dist`:** capacities now mean *total
+   launchers per type*, not *available pregame servers*. For our private one-game-at-a-time
+   server this is exactly right: steady state is **exactly 2 processes** (1 singleplayer +
+   1 multiplayer), 456MiB container RSS at idle.
+
+**Verified:** post-fix restart → exactly 2 servers (6000/6001), "Skipping pbem (capacity 0)"
+logged, `epoch-check.sh` (ruleset validate + autogame smoke) passes, count stable across the
+smoke test's transient server and across 14+ min of idle uptime (past the first
+`--quitidle 600` window) with zero new ports. (Notably, at 600s the idle servers did not even
+recycle during observation — no churn at all. Regardless, the spawn gate is now structural:
+it counts live launcher threads, so metaserver registration flaps can no longer ratchet the
+pool whenever recycles do occur.)
+
+**Deployment:** `publite2.py` + `settings.ini.dist` are COPYd into the image at build; the fix
+was also `docker cp`'d into the running local container. **The droplet (`palatine-ov2`) still
+runs the leaking code — redeploy (git pull + `docker compose build`) before the next session,
+or at minimum `docker cp` the fixed `publite2.py` there and restart.**

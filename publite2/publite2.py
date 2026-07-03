@@ -99,6 +99,21 @@ class metachecker():
                       + " servers (the server limit) but according to the"
                       + " metaserver it has found none.");
 
+              # Epoch leak fix: spawn decisions below are gated on OUR live
+              # launcher list, not the metaserver counts read above. The
+              # metaserver numbers lag while servers boot and flap while
+              # --quitidle recycles them; Civlauncher threads are immortal
+              # (while-1 respawn) and server_list is append-only, so gating
+              # on metaserver counts ratchets the pool up by one launcher per
+              # lag window, forever (measured: 24 launchers with
+              # server_limit=6; 250+ overnight before tuning). Capacities now
+              # mean "total launchers of this type" and server_limit is a
+              # hard cap on total launchers — enforced against ground truth.
+              self.server_list = [s for s in self.server_list if s.is_alive()]
+              single_launchers = sum(1 for s in self.server_list if s.gametype == game_types[0])
+              multi_launchers  = sum(1 for s in self.server_list if s.gametype == game_types[1])
+              pbem_launchers   = sum(1 for s in self.server_list if s.gametype == game_types[2])
+
               # Start LongTurn games, one per pass
               lt_scripts = glob.glob('pubscript_longturn_*.serv')
               self.longturn.intersection_update(lt_scripts)
@@ -113,38 +128,35 @@ class metachecker():
                    self.longturn.add(script)
                    break
 
-              while (self.single < self.server_capacity_single
-                     and self.total <= self.server_limit
+              while (single_launchers < self.server_capacity_single
+                     and len(self.server_list) < self.server_limit
                      and not fork_bomb_preventer):
                 time.sleep(1)
                 new_server = Civlauncher(game_types[0], game_types[0], port, metahost + ":" + str(metaport) + metapath, self.savesdir);
                 self.server_list.append(new_server);
                 new_server.start();
                 port += 1;
-                self.total += 1;
-                self.single += 1;
+                single_launchers += 1;
 
-              while (self.multi < self.server_capacity_multi
-                     and self.total <= self.server_limit
+              while (multi_launchers < self.server_capacity_multi
+                     and len(self.server_list) < self.server_limit
                      and not fork_bomb_preventer):
                 time.sleep(1)
                 new_server = Civlauncher(game_types[1], game_types[1], port, metahost + ":" + str(metaport) + metapath, self.savesdir)
                 self.server_list.append(new_server);
                 new_server.start();
                 port += 1;
-                self.total += 1;
-                self.multi += 1;
+                multi_launchers += 1;
 
-              while (self.pbem < self.server_capacity_pbem
-                     and self.total <= self.server_limit
+              while (pbem_launchers < self.server_capacity_pbem
+                     and len(self.server_list) < self.server_limit
                      and not fork_bomb_preventer):
                 time.sleep(1)
                 new_server = Civlauncher(game_types[2], game_types[2], port, metahost + ":" + str(metaport) + metapath, self.savesdir)
                 self.server_list.append(new_server);
                 new_server.start();
                 port += 1;
-                self.total += 1;
-                self.pbem += 1;
+                pbem_launchers += 1;
 
 
           else:
@@ -172,9 +184,17 @@ if __name__ == '__main__':
   finally:
     conn.close();
 
-  # Start the initial Freeciv-web servers
+  # Start the initial Freeciv-web servers.
+  # Epoch: skip game types with zero capacity (e.g. pbem) — the old code
+  # unconditionally spawned one immortal launcher per type regardless.
   mc = metachecker()
+  capacities = {game_types[0]: mc.server_capacity_single,
+                game_types[1]: mc.server_capacity_multi,
+                game_types[2]: mc.server_capacity_pbem}
   for type in game_types:
+    if capacities[type] < 1:
+      print("Skipping " + type + " (capacity 0)");
+      continue
     new_server = Civlauncher(type, type, port, metahost + ":" + str(metaport) + metapath, mc.savesdir)
     mc.server_list.append(new_server);
     new_server.start();

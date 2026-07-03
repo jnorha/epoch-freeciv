@@ -4,8 +4,15 @@ save_directory = /var/lib/tomcat10/webapps/data/savegames/
 
 [Resource usage]
 # Epoch: tuned for a small PRIVATE server (synchronous sessions), not a public
-# pubserver. See doc/design/publite2-pool-tuning.md for why these are small.
-# server_limit is a hard circuit breaker against the idle over-spawn leak.
+# pubserver. See doc/design/publite2-pool-tuning.md for the full story.
+#
+# SEMANTICS (changed by the Epoch leak fix in publite2.py): capacities are the
+# TOTAL number of launcher processes per game type, enforced against publite2's
+# own live launcher list — NOT "available pregame servers on the metaserver"
+# (the upstream meaning, which lags/flaps and caused the unbounded launcher
+# ratchet). server_limit is a hard cap on total launchers. With 1/1/0 the box
+# runs exactly two freeciv-web servers: one singleplayer, one multiplayer.
+# We only ever host one game at a time.
 server_capacity_single = 1
 server_capacity_multi = 1
 server_capacity_pbem = 0
