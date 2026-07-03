@@ -20,7 +20,9 @@ services:
     ports:
       - "127.0.0.1:4317:4317"    # gRPC OTLP
       - "127.0.0.1:4318:4318"    # HTTP OTLP
-      - "127.0.0.1:8888:8888"    # collector self-metrics (Prometheus scrape)
+      - "127.0.0.1:8889:8888"    # collector self-metrics (Prometheus scrape)
+      # NOTE: host 8888 is already claimed by the main freeciv-web container
+      # (docker-compose.yml maps 8888:8080 as an alt Tomcat access port)
     networks:
       - epoch-obs
 
