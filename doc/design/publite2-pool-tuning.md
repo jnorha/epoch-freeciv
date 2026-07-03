@@ -65,9 +65,26 @@ model rather than a public pubserver:
   `--exit-on-end` still fires immediately on game completion regardless, so finished games
   don't linger.
 
+### 3. Removed the auto-starting longturn game pool
+`publite2.py` globs `pubscript_longturn_*.serv` and starts one persistent (never-quitidle)
+game per file. Upstream ships 5 sample longturn configs → 5 permanent servers we never use.
+We chose **synchronous sessions, not async/longturn** (see ROADMAP execution log), so these
+are pure dead weight. Deleted `publite2/pubscript_longturn_*.serv` and
+`publite2/longturn_*.ruleset` from the fork. (If a future upstream merge re-adds them,
+delete again — publite2 globs the directory unconditionally, so removing the files is the
+simplest off switch.)
+
+### Startup overshoot (known, bounded, acceptable)
+publite2 gates spawning on the metaserver's count of *registered* available servers, which
+lags while freshly-spawned servers boot (C server + proxy take a few seconds each). So
+during the first minute or two it over-provisions a handful of extra pool servers before the
+registered count catches up and spawning stops. This is bounded (settles, doesn't run away)
+and self-corrects as the extras quitidle after 10 min. Not worth a deeper publite2 patch for
+our low-traffic use case.
+
 ### Steady state after the fix
-1 single + 1 multi + 1 initial pbem launcher ≈ 3 persistent servers (~160MB), churning at
-most every 10 min instead of every 20s. Circuit-breaker cap of 6.
+~1 single + 1 multi + 1 initial pbem + brief startup overshoot, no longturn — a few hundred
+MB idle instead of 14GB. Circuit-breaker cap of 6 on the pooled types.
 
 ## Deployment note
 
