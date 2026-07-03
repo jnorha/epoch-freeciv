@@ -61,6 +61,16 @@ processors:
           - key: epoch.plane
             value: game
 
+  # Promote these resource attributes to Loki stream labels. The lokiexporter
+  # reads the special "loki.resource.labels" resource attribute as a comma-
+  # separated allowlist -- this is the current (0.103.0) replacement for the
+  # older exporter-level `labels:` config block.
+  resource/loki_labels:
+    attributes:
+      - key: loki.resource.labels
+        value: "epoch.plane, service.name, game.id"
+        action: insert
+
 exporters:
   prometheusremotewrite:
     endpoint: "http://prometheus:9090/api/v1/write"
@@ -72,11 +82,6 @@ exporters:
     default_labels_enabled:
       exporter: false
       job: true
-    labels:
-      resource:
-        - epoch.plane
-        - service.name
-        - game.id
 
   # Debug: uncomment to see all telemetry in collector logs
   # debug:
@@ -91,10 +96,10 @@ service:
 
     logs/game:
       receivers: [otlp]
-      processors: [attributes/epoch_version, filter/game_plane, batch]
+      processors: [attributes/epoch_version, filter/game_plane, resource/loki_labels, batch]
       exporters: [loki]
 
     logs/ops:
       receivers: [otlp]
-      processors: [attributes/epoch_version, filter/ops_plane, batch]
+      processors: [attributes/epoch_version, filter/ops_plane, resource/loki_labels, batch]
       exporters: [loki]
