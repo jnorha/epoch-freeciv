@@ -1,10 +1,13 @@
 # Epoch observability overlay
-# Usage: docker-compose -f ../docker-compose.yml -f docker-compose.obs.yml up -d
-# (run from ops/ directory, or adjust paths accordingly)
+# Usage (from the ops/ directory): docker compose -f docker-compose.obs.yml up -d
 #
 # Stack: OTel Collector → Prometheus (metrics) + Loki (logs) → Grafana (dashboards/alerts)
-
-version: "3.8"
+# cAdvisor supplies real container CPU/mem/network metrics (scraped by Prometheus directly).
+#
+# SECURITY: all ports below are bound to 127.0.0.1 only — none of this stack has its own
+# auth except Grafana's login, and Prometheus/Loki have none at all. Access remotely via
+# an SSH tunnel (or Tailscale once that's wired up), never by opening these ports publicly:
+#   ssh -L 3000:127.0.0.1:3000 -L 9090:127.0.0.1:9090 -i ~/.ssh/id_ed25519 root@<droplet-ip>
 
 services:
 
@@ -15,9 +18,25 @@ services:
     volumes:
       - ./observability/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml:ro
     ports:
-      - "4317:4317"    # gRPC OTLP
-      - "4318:4318"    # HTTP OTLP
-      - "8888:8888"    # collector self-metrics (Prometheus scrape)
+      - "127.0.0.1:4317:4317"    # gRPC OTLP
+      - "127.0.0.1:4318:4318"    # HTTP OTLP
+      - "127.0.0.1:8888:8888"    # collector self-metrics (Prometheus scrape)
+    networks:
+      - epoch-obs
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    container_name: epoch-cadvisor
+    restart: unless-stopped
+    privileged: true
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    ports:
+      - "127.0.0.1:8085:8080"
     networks:
       - epoch-obs
 
@@ -34,7 +53,7 @@ services:
       - "--storage.tsdb.retention.time=30d"
       - "--web.enable-lifecycle"
     ports:
-      - "9090:9090"
+      - "127.0.0.1:9090:9090"
     networks:
       - epoch-obs
 
@@ -47,7 +66,7 @@ services:
       - loki-data:/loki
     command: -config.file=/etc/loki/local-config.yaml
     ports:
-      - "3100:3100"
+      - "127.0.0.1:3100:3100"
     networks:
       - epoch-obs
 
@@ -57,7 +76,7 @@ services:
     restart: unless-stopped
     environment:
       - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-epoch-change-me}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:?set GRAFANA_ADMIN_PASSWORD in ops/.env}
       - GF_USERS_ALLOW_SIGN_UP=false
       - GF_SERVER_ROOT_URL=http://localhost:3000
     volumes:
@@ -65,7 +84,7 @@ services:
       - ./observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
       - grafana-data:/var/lib/grafana
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     networks:
       - epoch-obs
     depends_on:

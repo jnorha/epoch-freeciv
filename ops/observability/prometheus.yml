@@ -24,6 +24,12 @@ scrape_configs:
     static_configs:
       - targets: [loki:3100]
 
+  # cAdvisor: real per-container CPU/mem/network metrics (covers the freeciv-web
+  # container until app-level OTel instrumentation is added)
+  - job_name: cadvisor
+    static_configs:
+      - targets: [cadvisor:8080]
+
   # freeciv-proxy WebSocket stats (when OTel SDK added to proxy)
   # - job_name: freeciv-proxy
   #   static_configs:
