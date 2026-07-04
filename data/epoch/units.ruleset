@@ -1984,7 +1984,8 @@ uk_shield     = 1
 uk_food       = 1
 uk_gold       = 1
 tp_defense    = "Alight"
-flags         = ""
+flags         = "Bombarder"
+bombard_rate  = 1
 roles         = "AttackStrongStartUnit"
 helptext      = _("\
 Catapults are large rock-throwing machines of war.\
@@ -2026,7 +2027,8 @@ uk_shield     = 1
 uk_food       = 1
 uk_gold       = 1
 tp_defense    = "Alight"
-flags         = ""
+flags         = "Bombarder"
+bombard_rate  = 2
 roles         = "AttackStrongStartUnit", "BarbarianTech", "BarbarianBuildTech"
 helptext      = _("\
 Cannons are large firearms that can fire heavy projectiles over long \
@@ -2064,7 +2066,8 @@ uk_shield     = 1
 uk_food       = 1
 uk_gold       = 1
 tp_defense    = "Alight"
-flags         = "CityBuster"
+flags         = "CityBuster", "Bombarder"
+bombard_rate  = 3
 roles         = "AttackStrongStartUnit"
 helptext      = _("\
 The artillery is an upgraded cannon. As with its predecessors, it is a \
@@ -2101,7 +2104,8 @@ uk_shield     = 1
 uk_food       = 1
 uk_gold       = 1
 tp_defense    = "Alight"
-flags         = "CityBuster"
+flags         = "CityBuster", "Bombarder"
+bombard_rate  = 4
 roles         = "AttackStrongStartUnit"
 helptext      = _("\
 Howitzers are upgraded artillery with improved defensive as well as \
