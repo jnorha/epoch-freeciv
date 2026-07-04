@@ -96,6 +96,34 @@ tune in the ruleset:
    tiles, emits no Lua/engine errors, and can be captured by an enemy undersea unit.
 4. `citymindist` is respected between an undersea city and adjacent land cities.
 
+### 5a. Implementation + verification (✅ SHIPPED 2026-07-03, develop)
+Built exactly as designed: dropped `"NoCities"` from `[terrain_ocean]` (Deep Ocean + Lake keep it);
+added `[unit_abyssal_founder]` — `Sea` class, `Tech "Abyssal Engineering"`, `flags = "Cities",
+"NonMil", "Cant_Fortify", "HasNoZOC", "BadCityDefender"`, placeholder graphic `u.caravel`.
+
+**The gate needs ZERO enabler changes** — proven by reading the C: the Found City enablers
+(`actions.ruleset` `enabler_build_city_pioneer`/`_domestic`) require actor `UnitState = OnLivableTile`,
+which `requirements.c:4635` evaluates as `can_unit_exist_at_tile()` — **native-class only, it does
+NOT check `NoCities`.** So a `Sea` founder on shallow Ocean satisfies `OnLivableTile`; target reqs
+already say `TerrainFlag NoCities = FALSE`, now true on the shelf. A land Settler is `Small Land`,
+not native to Ocean, so it can't stand there and `OnLivableTile` fails → the Ember-age exploit is
+structurally impossible.
+
+**Empirical spike (real unit + Found City ACTION, not `edit.create_city`) — PASS:**
+- Negative: `edit.create_unit(P, oceanTile, "Settlers", ...)` returned **nil** (unplaceable). ✓
+- Positive: Abyssal Founder placed on shelf (6,1); `founder:perform_action(find.action("Found City"),
+  tile)` returned **true**; a city was present at the tile immediately after. ✓
+- Survival: the undersea city persisted **all 16 watched turns (t3→t18) at size 1, zero Lua/engine
+  errors** — it did *not* starve. Flat size-1 with no workers/harbor is the food knob in §3, not an
+  engine limit; growth tuning (Harbor-equivalent + undersea improvements, `feature-sea-improvements.md`)
+  is deferred content, not a blocker. ✓
+- (checks 3-grow-past-1 and 4-citymindist/capture deferred to the balance + Helix-building pass.)
+
+**Lua/tolua notes for the next spike:** `player.is_alive` is a boolean **property** (dot, not
+`:is_alive()`); city iteration is **per-player** `p:cities_iterate()` (no global `cities_iterate`);
+`whole_map_iterate()`, `tile:square_iterate(r)`, `tile.terrain:rule_name()` all work as written;
+`unit:perform_action(action, tile)` is the tile-target action path (`find.action("Found City")`).
+
 ## 6. Open questions
 - **One buildable terrain or a distinct "Continental Shelf" terrain?** Recommend reusing shallow
   `Ocean` (fewer terrains, less art) unless item 1.4's resource design wants a separate shelf type.

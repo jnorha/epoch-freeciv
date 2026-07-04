@@ -355,7 +355,11 @@ warmer_drier_result  = "no"
 cooler_wetter_result = "Glacier"
 cooler_drier_result  = "no"
 native_to            = "Sea", "Air", "Missile", "Helicopter", "Trireme"
-flags                = "NoCities", "UnsafeCoast", "NoZoc", "NoFortify", "Sea"
+; NoCities removed (Epoch 2.1): shallow Ocean is the buildable continental shelf for
+; undersea cities. Deep Ocean + Lake keep NoCities. Capability is tech-gated on the
+; founder unit (Abyssal Founder / Abyssal Engineering), not the terrain — a land
+; Settler is Small-Land class, can't stand on Ocean, so OnLivableTile fails for it.
+flags                = "UnsafeCoast", "NoZoc", "NoFortify", "Sea"
 property_ocean_depth = 35
 color.r              = 0
 color.g              = 46

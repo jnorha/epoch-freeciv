@@ -522,6 +522,49 @@ TIP: optimal production of Settlers occurs in cities of at most \
 size 4, or cities with a Granary of at most size 6.\
 ")
 
+[unit_abyssal_founder]
+name          = _("Abyssal Founder")
+class         = "Sea"
+reqs          =
+  { "type", "name", "range"
+    "Tech", "Abyssal Engineering", "Player"
+  }
+obsolete_by   = "None"
+graphic       = "u.caravel"
+graphic_alt   = "u.transport"
+sound_move    = "m_settlers"
+sound_move_alt = "m_generic"
+sound_fight   = "f_settlers"
+sound_fight_alt = "f_generic"
+build_cost    = 60
+pop_cost      = 2
+attack        = 0
+defense       = 2
+hitpoints     = 20
+firepower     = 1
+move_rate     = 4
+vision_radius_sq = 8
+transport_cap = 0
+fuel          = 0
+uk_happy      = 0
+uk_shield     = 0
+uk_food       = 1
+uk_gold       = 0
+tp_defense    = "Alight"
+flags         = "Cities", "NonMil", "Cant_Fortify", "HasNoZOC", "BadCityDefender"
+; No veteran levels (colonizer, never fights)
+veteran_names = _("green")
+veteran_base_raise_chance = 0
+veteran_work_raise_chance = 0
+veteran_power_fact = 100
+veteran_move_bonus = 0
+helptext      = _("\
+The Abyssal Founder is an ocean-native colonizer, unlocked by Abyssal \
+Engineering in the Helix age. It cannot operate on land; instead it settles \
+the continental shelf (shallow Ocean), founding undersea cities where no land \
+Settler can reach. Deep Ocean and inland Lakes remain uninhabitable.\
+")
+
 [unit_migrants]
 name          = _("Migrants")
 class         = "Small Land"
