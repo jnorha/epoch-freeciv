@@ -221,6 +221,17 @@ hp_loss_pct   = 10
 flags         = "Unreachable", "DoesntOccupyTile", "CanPillage",
                 "Airliftable", "HutFrighten", "Aerial"
 
+[unitclass_orbital]
+; /* TRANS: Unit class: used adjectivally */
+; Epoch 3.2 — the "orbital layer": a class native to EVERY terrain (see each
+; terrain's native_to), so orbital units range freely over the whole map without
+; a second Z-layer. Permanent (hp_loss_pct=0, no fuel); Unreachable so only other
+; orbital / anti-orbital units (targets="Orbital") can strike them.
+name          = _("?unitclass:Orbital")
+min_speed     = 1
+hp_loss_pct   = 0
+flags         = "Unreachable", "DoesntOccupyTile", "Airliftable"
+
 ; /* <-- avoid gettext warnings
 ;
 ; Below: The individual unit types, one per section.
@@ -3235,7 +3246,7 @@ A fusion-powered capital ship -- the Lattice successor to the Battleship.\
 
 [unit_space_plane]
 name          = _("Space Plane")
-class         = "Air"
+class         = "Orbital"
 reqs          =
   { "type", "name", "range"
     "Tech", "Orbital Logistics", "Player"
@@ -3256,15 +3267,94 @@ firepower     = 1
 move_rate     = 18
 vision_radius_sq = 3
 transport_cap = 0
-fuel          = 2
+fuel          = 0
 uk_happy      = 1
 uk_shield     = 1
 uk_food       = 0
 uk_gold       = 0
 tp_defense    = "Alight"
-flags         = "AirAttacker", "HasNoZOC"
+flags         = "HasNoZOC"
 roles         = "Hunter"
 helptext      = _("\
-A sub-orbital strike craft with tremendous range. (The true all-terrain \
-Orbital unit class and weapon platforms arrive with item 3.2.)\
+The mobile face of the Orbital layer: an all-terrain strike craft that ranges \
+freely over land, sea and ice alike. Being Orbital it cannot be touched by \
+ground or naval fire — only Orbital Interceptors and other orbital craft can \
+bring it down.\
+")
+
+[unit_weapon_platform]
+name          = _("Weapon Platform")
+class         = "Orbital"
+reqs          =
+  { "type", "name", "range"
+    "Tech", "Orbital Ordnance", "Player"
+  }
+obsolete_by   = "None"
+graphic       = "u.howitzer"
+graphic_alt   = "u.artillery"
+sound_move    = "m_generic"
+sound_move_alt = "m_generic"
+sound_fight   = "f_generic"
+sound_fight_alt = "f_generic"
+build_cost    = 140
+pop_cost      = 0
+attack        = 20
+defense       = 6
+hitpoints     = 30
+firepower     = 1
+bombard_rate  = 4
+move_rate     = 4
+vision_radius_sq = 3
+transport_cap = 0
+fuel          = 0
+uk_happy      = 2
+uk_shield     = 2
+uk_food       = 0
+uk_gold       = 0
+tp_defense    = "Alight"
+flags         = "Bombarder", "FieldUnit", "HasNoZOC", "BadCityDefender"
+roles         = "Hunter"
+helptext      = _("\
+An orbital bombardment platform. It rains fire on ground targets from range \
+via a Bombard attack, damaging a whole stack without descending into the \
+tile or exposing itself. Slow to reposition and a poor defender; keep it \
+screened by interceptors.\
+")
+
+[unit_orbital_interceptor]
+name          = _("Orbital Interceptor")
+class         = "Orbital"
+reqs          =
+  { "type", "name", "range"
+    "Tech", "Orbital Foundries", "Player"
+  }
+obsolete_by   = "None"
+graphic       = "u.stealth_fighter"
+graphic_alt   = "-"
+sound_move    = "m_generic"
+sound_move_alt = "m_generic"
+sound_fight   = "f_generic"
+sound_fight_alt = "f_generic"
+build_cost    = 120
+pop_cost      = 0
+attack        = 16
+defense       = 14
+hitpoints     = 35
+firepower     = 1
+move_rate     = 12
+vision_radius_sq = 3
+transport_cap = 0
+fuel          = 0
+uk_happy      = 1
+uk_shield     = 1
+uk_food       = 0
+uk_gold       = 0
+tp_defense    = "Alight"
+targets       = "Orbital"
+flags         = "HasNoZOC"
+roles         = "Hunter"
+helptext      = _("\
+Anti-orbital fighter. Alone among the roster it can reach the Orbital layer, \
+striking Space Planes and Weapon Platforms that ground and naval units cannot \
+touch. The answer to enemy orbital dominance.\
 ")

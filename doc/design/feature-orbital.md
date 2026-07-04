@@ -92,6 +92,35 @@ target tile without the platform moving in or dying):
 3. A Weapon Platform Bombards a ground stack from `bombard_max_range` without entering the tile.
 4. No orbital unit is buildable before its Lattice `tech_req`.
 
+### 5a. Implementation + verification (✅ SHIPPED 2026-07-03, develop)
+Built as designed. Added `[unitclass_orbital]` (`flags = "Unreachable", "DoesntOccupyTile",
+"Airliftable"`, `hp_loss_pct = 0`, permanent) — class **#10 of 32**, budget fine. Appended
+`"Orbital"` to **all 13 terrain `native_to` lines** (every terrain section; the extras/base
+`native_to` lines below were deliberately left untouched). Orbital roster (69 units total):
+- **Space Plane** (reclassed Air→Orbital, `Tech "Orbital Logistics"`, fuel 2→0 permanent) — the
+  mobile all-terrain unit.
+- **Weapon Platform** (`Tech "Orbital Ordnance"`, `flags "Bombarder","FieldUnit",...`,
+  `bombard_rate = 4`, `attack 20`) — orbital bombardment; uses the engine Bombard action
+  (`enabler_bombard_no_city` requires actor `UnitTypeFlag "Bombarder"`, targets non-Oceanic tiles).
+- **Orbital Interceptor** (`Tech "Orbital Foundries"`, `targets = "Orbital"`) — the counter-play;
+  its `targets` field lets it strike the otherwise-`Unreachable` orbital layer.
+
+**S4 spike — PASS (in-container).** Using the same nativity signal that cleanly rejected the
+2.1 Settler-on-ocean (`edit.create_unit` returns nil when a unit can't exist on a tile): a Space
+Plane was **creatable on all 9 terrain types the map contained — both Ocean *and* Deep Ocean plus
+Hills/Desert/Forest/Swamp/Plains/Mountains/Grassland** (space-plane-native-on-all = true), proving
+it crosses the land↔water boundary freely — the one novel claim S4 was pending on. Controls held:
+a Land `Warriors` could **not** be created on Ocean and a Sea `Transport` could **not** be created
+on a land tile. Glacier/Tundra/Lake weren't on that map but received `"Orbital"` by construction
+(13/13 terrain lines) and the ruleset validates clean. `Unreachable` + `Bombard` are engine-native
+(Air-class / artillery precedent) and are wired + load-validated; their live combat behavior is
+standard-engine, deferred to a play test rather than a headless spike.
+
+**Deferred:** Bombard range/rate tuning + interceptor-vs-platform combat play test (check 2's
+"IS attackable by interceptor" and check 3's live Bombard); vision tuning; transport/cargo on the
+Space Plane; optional "Orbital Strike" User Action after-effect (coordinate slots with
+`feature-special-actions.md`).
+
 ## 6. Open questions
 - **Exact class flags:** confirm the best existing flags for "high-altitude, all-terrain,
   hard-to-hit" from the fixed class-flag set during S4 (Unreachable + which others).
