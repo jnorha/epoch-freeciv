@@ -1,0 +1,58 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Caddyfile — password gate for the Epoch public game (host-level reverse proxy)
+#
+# Runs on the DROPLET's host (NOT in the container), on :80 (and :443 if you
+# have a domain). It puts a shared-password prompt in front of the whole game
+# and forwards everything — including the game WebSocket — to the freeciv-web
+# container's nginx on 127.0.0.1:8080.
+#
+# Friends then visit  http://178.128.231.84/  , enter the shared password, and
+# play. The container's :8080 (and all other Docker ports) stay OFF the public
+# internet via the DigitalOcean Cloud Firewall — Caddy on :80/:443 is the only
+# public door, and it's locked.
+#
+# ── Setup (see ops/droplet/README.md for the full runbook) ───────────────────
+#   1. Install Caddy:
+#        sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https curl
+#        curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' \
+#          | sudo gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+#        curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' \
+#          | sudo tee /etc/apt/sources.list.d/caddy-stable.list
+#        sudo apt update && sudo apt install -y caddy
+#   2. Generate the password hash (pick your shared password):
+#        caddy hash-password --plaintext 'YOUR-SHARED-PASSWORD'
+#      Paste the resulting $2a$... bcrypt hash below, replacing REPLACE_ME_HASH.
+#   3. Install this file:  sudo cp Caddyfile /etc/caddy/Caddyfile
+#   4. sudo systemctl reload caddy   (or: sudo systemctl enable --now caddy)
+#
+# NOTE: over plain HTTP the password is base64-encoded, effectively cleartext on
+# the wire — fine for a friends-only game gate. For real TLS, point a domain at
+# the droplet and use the HTTPS block at the bottom instead (Caddy then fetches
+# a Let's Encrypt cert automatically).
+# ─────────────────────────────────────────────────────────────────────────────
+
+:80 {
+	# One shared account. Username "epoch", password = the bcrypt hash from
+	# `caddy hash-password`. Add more `user <hash>` lines for per-person logins.
+	basic_auth {
+		epoch REPLACE_ME_HASH
+	}
+
+	# Forward everything to the container's nginx. reverse_proxy upgrades
+	# WebSocket connections automatically, so the freeciv game socket works.
+	reverse_proxy 127.0.0.1:8080
+
+	encode gzip
+	log {
+		output file /var/log/caddy/epoch-access.log
+	}
+}
+
+# ── HTTPS variant (uncomment + set your domain; delete the :80 block above) ───
+# game.example.com {
+# 	basic_auth {
+# 		epoch REPLACE_ME_HASH
+# 	}
+# 	reverse_proxy 127.0.0.1:8080
+# 	encode gzip
+# }

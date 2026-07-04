@@ -24,10 +24,12 @@ name: deploy to droplet
 # * Trigger is version tags + manual dispatch — NOT every push (a 20-30 min
 #   build per commit on a 2-core box is impractical). Tag a release (`git tag
 #   v0.1 && git push --tags`) or run the workflow manually with a ref.
-# * Port 22 must be reachable from GitHub's runners. The roadmap flags closing
-#   raw 22 in favour of Tailscale SSH; if/when that lands, swap the ssh step for
-#   the tailscale/github-action + `tailscale ssh`. Until then this uses key auth
-#   over public 22.
+# * Port 22 must be reachable from GitHub's runners. The lockdown decision
+#   (see ops/droplet/README.md) is: keep 22 open to all sources but key-only +
+#   fail2ban (so this deploy keeps working), and lock every other port at the
+#   DigitalOcean Cloud Firewall, with a Caddy basic-auth gate in front of the
+#   game. If you instead allowlist 22 to your own IP, this workflow will no
+#   longer be able to connect — deploy manually per the runbook.
 
 on:
   push:
