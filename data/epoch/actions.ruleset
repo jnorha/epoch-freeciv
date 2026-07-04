@@ -1595,36 +1595,58 @@ target_reqs   =
 ; spike) until diplomacy lands; revisit with backlog 1.7 government gating.
 ; ------------------------------------------------------------
 
+; Government gating (roadmap 1.7 tie-in): a state's form decides which
+; unconventional operations it will sanction. Restrictive Gov reqs (Player
+; range) forbid an op under the listed governments; each unit stays usable
+; under the rest. Thematic, tunable — adjust the forbidden set to taste.
+; Cleric (forced religious conversion) — not under accountable Democracy nor
+; the secular Synthesis (AI technocracy).
 [enabler_spec_cleric_convert]
 action        = "User Action 1"
 actor_reqs    =
-    { "type",         "name",       "range", "present"
-      "UnitTypeFlag", "SpecCleric", "Local", TRUE
-      "MinMoveFrags", "1",          "Local", TRUE
-      "DiplRel",      "Foreign",    "Local", TRUE
+    { "type",         "name",       "range",  "present"
+      "UnitTypeFlag", "SpecCleric", "Local",  TRUE
+      "MinMoveFrags", "1",          "Local",  TRUE
+      "DiplRel",      "Foreign",    "Local",  TRUE
+      "Gov",          "Democracy",  "Player", FALSE
+      "Gov",          "Synthesis",  "Player", FALSE
     }
 
+; Corporate Branch (economic franchise) — not under Communism (no private
+; enterprise) nor Anarchy (no functioning economy).
 [enabler_spec_corp_franchise]
 action        = "User Action 1"
 actor_reqs    =
-    { "type",         "name",     "range", "present"
-      "UnitTypeFlag", "SpecCorp", "Local", TRUE
-      "MinMoveFrags", "1",        "Local", TRUE
-      "DiplRel",      "Foreign",  "Local", TRUE
+    { "type",         "name",      "range",  "present"
+      "UnitTypeFlag", "SpecCorp",  "Local",  TRUE
+      "MinMoveFrags", "1",         "Local",  TRUE
+      "DiplRel",      "Foreign",   "Local",  TRUE
+      "Gov",          "Communism", "Player", FALSE
+      "Gov",          "Anarchy",   "Player", FALSE
     }
 
+; Ecoterrorist (pollution sabotage) — not under Stewardship (the ecological
+; order would never seed pollution) nor Democracy (accountable, won't sanction
+; eco-terror).
 [enabler_spec_eco_sabotage]
 action        = "User Action 3"
 actor_reqs    =
-    { "type",         "name",    "range", "present"
-      "UnitTypeFlag", "SpecEco", "Local", TRUE
-      "MinMoveFrags", "1",       "Local", TRUE
+    { "type",         "name",        "range",  "present"
+      "UnitTypeFlag", "SpecEco",     "Local",  TRUE
+      "MinMoveFrags", "1",           "Local",  TRUE
+      "Gov",          "Stewardship", "Player", FALSE
+      "Gov",          "Democracy",   "Player", FALSE
     }
 
+; Lawyer (legal injunction) — needs a functioning rule of law: not under
+; Anarchy, Tribal, or Despotism (no courts to issue an injunction).
 [enabler_spec_lawyer_injunction]
 action        = "User Action 4"
 actor_reqs    =
-    { "type",         "name",       "range", "present"
-      "UnitTypeFlag", "SpecLawyer", "Local", TRUE
-      "MinMoveFrags", "1",          "Local", TRUE
+    { "type",         "name",       "range",  "present"
+      "UnitTypeFlag", "SpecLawyer", "Local",  TRUE
+      "MinMoveFrags", "1",          "Local",  TRUE
+      "Gov",          "Anarchy",    "Player", FALSE
+      "Gov",          "Tribal",     "Player", FALSE
+      "Gov",          "Despotism",  "Player", FALSE
     }
