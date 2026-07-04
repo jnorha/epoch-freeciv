@@ -441,6 +441,29 @@ user_action_3_min_range              = 0
 user_action_3_max_range              = 1
 user_action_3_actor_consuming_always = FALSE
 
+; Slot 1 -- the shared City slot ("Civic Operation"): Cleric conversion and
+; Corporate Branch franchising today; Televangelist/Slaver later. The slot's
+; actor_consuming_always MUST stay FALSE because consuming (Cleric) and
+; repeatable (Corporate Branch) units share it -- consumption is per-unit,
+; done in Lua by epoch_run_special via edit.unit_kill (the same wrinkle slot 3
+; has with Public Works; unithand.c explicitly tolerates the actor dying
+; during "pre action Lua").
+; /* TRANS: _Civic Operation (100% chance of success). */
+ui_name_user_action_1                = _("%sCivic Operation%s")
+user_action_1_target_kind            = "City"
+user_action_1_min_range              = 0
+user_action_1_max_range              = 1
+user_action_1_actor_consuming_always = FALSE
+
+; Slot 4 -- the Self slot ("Legal Injunction"): the Lawyer, acting on its own
+; tile. Consumption handled in Lua like the other slots (uniform policy).
+; /* TRANS: _Legal Injunction (100% chance of success). */
+ui_name_user_action_4                = _("%sLegal Injunction%s")
+user_action_4_target_kind            = "Self"
+user_action_4_min_range              = 0
+user_action_4_max_range              = 0
+user_action_4_actor_consuming_always = FALSE
+
 ; Some actions have a action dice roll before the action starts where it can
 ; fail. The initial probability of success is 100% unless the action appears
 ; in the following list. Then the initial probability comes from the setting
@@ -1558,4 +1581,50 @@ actor_reqs    =
 target_reqs   =
     { "type",     "name",    "range", "present"
       "CityTile", "Claimed", "Tile",  TRUE
+    }
+
+; ------------------------------------------------------------
+; Epoch special actions (doc/design/feature-special-actions.md section 5).
+; One enabler per unit type; the Spec* UnitTypeFlag routes exactly one type
+; to each slot, so a selected unit only ever sees its own button. Cost,
+; success odds, effects and per-unit consumption all live in script.lua's
+; EPOCH_SPECIAL registry -- the enablers only gate WHO may push the button
+; and against WHAT. DELIBERATE v1 DEVIATION from the design sketch: no
+; "DiplRel War FALSE" on the Cleric -- freeciv players start at War by
+; default, which would dead-lock the whole mechanic (and the functional
+; spike) until diplomacy lands; revisit with backlog 1.7 government gating.
+; ------------------------------------------------------------
+
+[enabler_spec_cleric_convert]
+action        = "User Action 1"
+actor_reqs    =
+    { "type",         "name",       "range", "present"
+      "UnitTypeFlag", "SpecCleric", "Local", TRUE
+      "MinMoveFrags", "1",          "Local", TRUE
+      "DiplRel",      "Foreign",    "Local", TRUE
+    }
+
+[enabler_spec_corp_franchise]
+action        = "User Action 1"
+actor_reqs    =
+    { "type",         "name",     "range", "present"
+      "UnitTypeFlag", "SpecCorp", "Local", TRUE
+      "MinMoveFrags", "1",        "Local", TRUE
+      "DiplRel",      "Foreign",  "Local", TRUE
+    }
+
+[enabler_spec_eco_sabotage]
+action        = "User Action 3"
+actor_reqs    =
+    { "type",         "name",    "range", "present"
+      "UnitTypeFlag", "SpecEco", "Local", TRUE
+      "MinMoveFrags", "1",       "Local", TRUE
+    }
+
+[enabler_spec_lawyer_injunction]
+action        = "User Action 4"
+actor_reqs    =
+    { "type",         "name",       "range", "present"
+      "UnitTypeFlag", "SpecLawyer", "Local", TRUE
+      "MinMoveFrags", "1",          "Local", TRUE
     }

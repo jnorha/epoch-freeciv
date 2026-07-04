@@ -1827,6 +1827,34 @@ Ruins mark the former site of a city that was destroyed or abandoned. \
 They have no effect on gameplay.\
 ")
 
+; Epoch special actions (doc/design/feature-special-actions.md section 4):
+; a Lawyer's standing legal injunction, persisted as an Extra so it survives
+; save/load (Lua tables do not). Placed/removed ONLY by script.lua
+; (edit.create_extra / edit.remove_extra); the expiry timer lives in Lua.
+; DELIBERATELY has no "causes": a causes="Road"/"Base" extra without its
+; [road_*]/[base_*] twin SEGFAULTS the server at ruleset load (Sea Tunnel
+; finding), and units must never auto-build this marker anyway. NOTE: this
+; build has no "Hidden" extra flag (that is a unit_seen value); invisibility
+; comes from graphic "None" plus the web client having no draw code for it.
+[extra_injunction]
+name           = _("Injunction")
+category       = "Bonus"
+graphic        = "None"
+graphic_alt    = "-"
+activity_gfx   = "None"
+act_gfx_alt    = "-"
+act_gfx_alt2   = "-"
+rmact_gfx      = "None"
+rmact_gfx_alt  = "-"
+rmact_gfx_alt2 = "-"
+buildable      = FALSE
+removal_time   = 0
+helptext       = _("\
+A standing legal injunction filed by a Lawyer. While it remains on a tile, \
+hostile special operations (conversions, franchises, sabotage) against that \
+tile or its city are blocked. It lapses after a few turns.\
+")
+
 [extra_road]
 name           = _("Road")
 category       = "Infra"

@@ -46,6 +46,10 @@ flags =
     _("OneAttack")
     _("NoVeteran")
     _("PublicWorks"), _("Can commission Public Works improvements on owned tiles.")
+    _("SpecCleric"), _("Can attempt to convert foreign cities (Civic Operation).")
+    _("SpecLawyer"), _("Can file a legal injunction that blocks hostile special operations.")
+    _("SpecCorp"), _("Can franchise foreign cities for gold (Civic Operation).")
+    _("SpecEco"), _("Can sabotage tile improvements (Field Operation).")
   }
 
 ; Names for custom unit class flags. There can be up to 25 of these.
@@ -802,6 +806,188 @@ Surveyors direct the national Public Works pool. Move a Surveyor onto or \
 next to a tile you own and order a Field Operation to commission the \
 appropriate improvement there instantly, paid for from your Public Works \
 reserve. The reserve accumulates each turn from your cities.\
+")
+
+; ------------------------------------------------------------
+; Epoch special-action units (backlog 1.6, doc/design/feature-special-actions.md).
+; Each carries exactly one Spec* routing flag; that flag's enabler in
+; actions.ruleset is the ONLY way the unit reaches a User Action slot, and the
+; Lua registry EPOCH_SPECIAL in script.lua (keyed by rule_name) supplies cost/
+; odds/effect. Tech gating is on the unit (reqs below), not the action.
+; Placeholder graphics reuse stock diplomat/spy/freight/migrants tags -- no
+; new art (same policy as the far-future roster before its art pass).
+; ------------------------------------------------------------
+
+[unit_cleric]
+name          = _("Cleric")
+class         = "Small Land"
+reqs          =
+  { "type", "name", "range"
+    "Tech", "Monotheism", "Player"
+  }
+obsolete_by   = "None"
+graphic       = "u.diplomat"
+graphic_alt   = "-"
+sound_move    = "m_diplomat"
+sound_move_alt = "m_generic"
+sound_fight   = "f_diplomat"
+sound_fight_alt = "f_generic"
+build_cost    = 40
+pop_cost      = 0
+attack        = 0
+defense       = 1
+hitpoints     = 10
+firepower     = 1
+move_rate     = 2
+vision_radius_sq = 2
+transport_cap = 0
+fuel          = 0
+uk_happy      = 0
+uk_shield     = 1
+uk_food       = 0
+uk_gold       = 1
+tp_defense    = "Alight"
+flags         = "SpecCleric", "NonMil", "HasNoZOC", "Cant_Fortify", "NoVeteran"
+veteran_names = _("green")
+veteran_base_raise_chance = 0
+veteran_work_raise_chance = 0
+veteran_power_fact = 100
+veteran_move_bonus = 0
+helptext      = _("\
+Clerics carry the faith into foreign cities. Move a Cleric next to a \
+foreign city and order a Civic Operation to attempt a conversion: on \
+success the city joins your civilization. The attempt costs gold and \
+the Cleric is spent either way. A standing legal Injunction on the city \
+blocks the attempt entirely.\
+")
+
+[unit_lawyer]
+name          = _("Lawyer")
+class         = "Small Land"
+reqs          =
+  { "type", "name", "range"
+    "Tech", "Code of Laws", "Player"
+  }
+obsolete_by   = "None"
+graphic       = "u.spy"
+graphic_alt   = "u.diplomat"
+sound_move    = "m_diplomat"
+sound_move_alt = "m_generic"
+sound_fight   = "f_diplomat"
+sound_fight_alt = "f_generic"
+build_cost    = 40
+pop_cost      = 0
+attack        = 0
+defense       = 1
+hitpoints     = 10
+firepower     = 1
+move_rate     = 2
+vision_radius_sq = 2
+transport_cap = 0
+fuel          = 0
+uk_happy      = 0
+uk_shield     = 1
+uk_food       = 0
+uk_gold       = 1
+tp_defense    = "Alight"
+flags         = "SpecLawyer", "NonMil", "HasNoZOC", "Cant_Fortify", "NoVeteran"
+veteran_names = _("green")
+veteran_base_raise_chance = 0
+veteran_work_raise_chance = 0
+veteran_power_fact = 100
+veteran_move_bonus = 0
+helptext      = _("\
+Lawyers file legal injunctions. Move a Lawyer onto a tile you want to \
+protect (typically one of your cities) and order a Legal Injunction: for \
+a few turns, hostile special operations against that tile -- conversions, \
+franchises, sabotage -- are blocked outright. The Lawyer is spent filing \
+the paperwork.\
+")
+
+[unit_corporate_branch]
+name          = _("Corporate Branch")
+class         = "Small Land"
+reqs          =
+  { "type", "name", "range"
+    "Tech", "The Corporation", "Player"
+  }
+obsolete_by   = "None"
+graphic       = "u.freight"
+graphic_alt   = "u.caravan"
+sound_move    = "m_generic"
+sound_move_alt = "m_generic"
+sound_fight   = "f_generic"
+sound_fight_alt = "f_generic"
+build_cost    = 60
+pop_cost      = 0
+attack        = 0
+defense       = 1
+hitpoints     = 10
+firepower     = 1
+move_rate     = 2
+vision_radius_sq = 2
+transport_cap = 0
+fuel          = 0
+uk_happy      = 0
+uk_shield     = 1
+uk_food       = 0
+uk_gold       = 1
+tp_defense    = "Alight"
+flags         = "SpecCorp", "NonMil", "HasNoZOC", "Cant_Fortify", "NoVeteran"
+veteran_names = _("green")
+veteran_base_raise_chance = 0
+veteran_work_raise_chance = 0
+veteran_power_fact = 100
+veteran_move_bonus = 0
+helptext      = _("\
+A Corporate Branch office plants franchises abroad. Move it next to a \
+foreign city and order a Civic Operation to open a franchise there: on \
+success your treasury skims profit scaled to the city's size. The branch \
+is not expended -- it can move on and franchise city after city. A legal \
+Injunction on the city blocks the operation.\
+")
+
+[unit_ecoterrorist]
+name          = _("Ecoterrorist")
+class         = "Small Land"
+reqs          =
+  { "type", "name", "range"
+    "Tech", "Environmentalism", "Player"
+  }
+obsolete_by   = "None"
+graphic       = "u.migrants"
+graphic_alt   = "u.explorer"
+sound_move    = "m_generic"
+sound_move_alt = "m_generic"
+sound_fight   = "f_generic"
+sound_fight_alt = "f_generic"
+build_cost    = 50
+pop_cost      = 0
+attack        = 0
+defense       = 1
+hitpoints     = 10
+firepower     = 1
+move_rate     = 2
+vision_radius_sq = 2
+transport_cap = 0
+fuel          = 0
+uk_happy      = 0
+uk_shield     = 1
+uk_food       = 0
+uk_gold       = 1
+tp_defense    = "Alight"
+flags         = "SpecEco", "NonMil", "HasNoZOC", "Cant_Fortify", "NoVeteran"
+veteran_names = _("green")
+veteran_base_raise_chance = 0
+veteran_work_raise_chance = 0
+veteran_power_fact = 100
+veteran_move_bonus = 0
+helptext      = _("\
+Ecoterrorists sabotage the built environment. Order a Field Operation on \
+an adjacent tile to destroy its most developed improvement -- farmland, \
+mines, rails -- or, failing that, to foul the tile with pollution. The \
+operative disappears underground after the strike, successful or not. A \
+legal Injunction on the tile blocks the operation.\
 ")
 
 [unit_warriors]

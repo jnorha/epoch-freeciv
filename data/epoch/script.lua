@@ -540,6 +540,9 @@ function epoch_turn_begin(turn, year)
   -- Public Works accrual rides the same (single) turn_begin handler so it can
   -- never double-fire relative to the era rescan.
   epoch_pw_accrue(turn)
+  -- Expired legal injunctions are swept here too (special-actions module,
+  -- defined below; global lookup resolves at call time).
+  epoch_inj_sweep(turn)
 end
 signal.connect("turn_begin", "epoch_turn_begin")
 
@@ -789,3 +792,290 @@ function epoch_commission_works(action, actor, target_tile)
   epoch_pw_place(player, kind, target_tile)
 end
 signal.connect("action_started_unit_tile", "epoch_commission_works")
+
+-- ------------------------------------------------------------
+-- Special actions (backlog 1.5 + 1.6) — unconventional warfare.
+-- Design: doc/design/feature-special-actions.md. One registry (EPOCH_SPECIAL,
+-- keyed by unit rule_name) + one runner (epoch_run_special); the 4 User
+-- Action slots are multiplexed by Spec* unit-type flags (actions.ruleset);
+-- the Lawyer's counter-injunction persists as the "Injunction" Extra
+-- (terrain.ruleset) so it survives save/load — only its expiry TIMER is Lua.
+--
+-- API verified against this build (tolua_server.pkg / tolua_game.pkg /
+-- unithand.c, 2026-07-04):
+--   edit.transfer_city(city, new_owner) -> bool   -- 2 args, NOT the 7-arg
+--     signature guessed in the design doc.
+--   edit.unit_kill(unit, reason, killer_or_nil)   -- reason must be a
+--     unit_loss_reason name; "used" is valid ("quiet" is NOT). The engine
+--     explicitly tolerates the actor dying inside the action_started signal
+--     ("Actor unit was destroyed during pre action Lua" re-check in
+--     unithand.c), so per-unit Lua consumption is safe. Consequence: a
+--     CONSUMING op makes unit:perform_action() return false even though the
+--     op ran — the engine aborts its (empty) native perform when the actor
+--     is gone. Callers must not read that as failure.
+--   player:gold() (method); city.size/.tile (properties), city.id/.name/
+--     .owner (fields); tile.id (index field); find.tile(index).
+--   random(1, 100) — the seeded fc_rand binding (MP-deterministic), same
+--     one the map-label code above uses.
+-- All slots keep actor_consuming_always=FALSE (slot 3 is locked FALSE by
+-- Public Works; slot 1 is shared by consuming Cleric + repeatable Corporate
+-- Branch), so consumption is ALWAYS the runner's job, per registry row.
+-- ------------------------------------------------------------
+
+EPOCH_CONFIG.special = {
+  injunction_turns = 5,   -- turns a Lawyer's injunction remains in force
+}
+
+local function epoch_clamp(v, lo, hi)
+  if v < lo then return lo end
+  if v > hi then return hi end
+  return v
+end
+
+-- ---- Injunction timers -------------------------------------------------
+-- The FACT of an injunction is the Extra on the tile (save-safe map data).
+-- This table holds only the expiry turn, keyed by tile index, mirrored into
+-- the scalar EPOCH_INJ_SAVED for savegames (same pattern as EPOCH_PW_SAVED:
+-- _freeciv_state_dump persists scalar globals only).
+EPOCH_STATE.injunctions = {}
+EPOCH_INJ_SAVED = ""
+local epoch_inj_hydrated = false
+
+local function epoch_inj_serialize()
+  local parts = {}
+  for tid, expiry in pairs(EPOCH_STATE.injunctions) do
+    parts[#parts + 1] = tostring(tid) .. ":" .. tostring(expiry)
+  end
+  EPOCH_INJ_SAVED = table.concat(parts, ";")
+end
+
+local function epoch_inj_rehydrate()
+  if epoch_inj_hydrated then return end
+  epoch_inj_hydrated = true
+  if EPOCH_INJ_SAVED == nil or EPOCH_INJ_SAVED == "" then return end
+  local n = 0
+  for tid, expiry in string.gmatch(EPOCH_INJ_SAVED, "(%d+):(%-?%d+)") do
+    EPOCH_STATE.injunctions[tonumber(tid)] = tonumber(expiry)
+    n = n + 1
+  end
+  log.normal("[EPOCH][inj_load] restored " .. tostring(n)
+             .. " injunction timers from savegame.")
+end
+
+function epoch_place_injunction(tile, turns)
+  epoch_inj_rehydrate()
+  if not tile:has_extra("Injunction") then
+    edit.create_extra(tile, "Injunction")
+  end
+  EPOCH_STATE.injunctions[tile.id] = epoch_current_turn + turns
+  epoch_inj_serialize()
+  log.normal(string.format(
+    "[EPOCH][inj_place] tile=%d expires=%d turn=%d",
+    tile.id, EPOCH_STATE.injunctions[tile.id], epoch_current_turn))
+end
+
+-- Called once per turn from epoch_turn_begin (single handler doctrine).
+function epoch_inj_sweep(turn)
+  epoch_inj_rehydrate()
+  local expired = {}
+  for tid, expiry in pairs(EPOCH_STATE.injunctions) do
+    if turn >= expiry then expired[#expired + 1] = tid end
+  end
+  for ei, tid in ipairs(expired) do
+    EPOCH_STATE.injunctions[tid] = nil
+    local tile = find.tile(tid)
+    if tile ~= nil and tile:has_extra("Injunction") then
+      edit.remove_extra(tile, "Injunction")
+    end
+    log.normal(string.format("[EPOCH][inj_expire] tile=%d turn=%d", tid, turn))
+  end
+  if #expired > 0 then epoch_inj_serialize() end
+end
+
+-- ---- The registry (one tuning surface) ---------------------------------
+-- Keyed by unit rule_name. action = which User Action slot the row answers
+-- to (double-checked against the fired action so a future slot reshuffle
+-- cannot silently mis-route). cost = gold. success(actor, target) -> 0..1.
+-- effect(actor, target) runs only on a successful roll. counter = Extra
+-- rule_name that blocks the op when present on the target tile (checked
+-- BEFORE any charge). consuming = unit spent on the attempt, win or lose.
+EPOCH_SPECIAL = {
+  ["Cleric"] = {
+    action = "User Action 1",
+    cost = 120,
+    consuming = true,
+    counter = "Injunction",
+    telemetry = "convert_city",
+    success = function(actor, city)
+      return epoch_clamp(0.75 - 0.05 * city.size, 0.05, 0.90)
+    end,
+    effect = function(actor, city)
+      local old_owner = city.owner
+      local cname = city.name
+      edit.transfer_city(city, actor.owner)
+      notify.event(actor.owner, city.tile, E.SCRIPT,
+        _("Your Cleric has converted %s to your cause!"), cname)
+      notify.event(old_owner, city.tile, E.SCRIPT,
+        _("%s has been converted by foreign clerics!"), cname)
+    end,
+  },
+  ["Corporate Branch"] = {
+    action = "User Action 1",
+    cost = 40,
+    consuming = false,
+    counter = "Injunction",
+    telemetry = "franchise",
+    success = function(actor, city)
+      return 0.85
+    end,
+    effect = function(actor, city)
+      local take = 60 + 10 * city.size
+      edit.change_gold(actor.owner, take)
+      notify.event(actor.owner, city.tile, E.SCRIPT,
+        _("Your Corporate Branch franchises %s: %d gold skimmed."),
+        city.name, take)
+      notify.event(city.owner, city.tile, E.SCRIPT,
+        _("A foreign corporation has opened a franchise in %s."), city.name)
+    end,
+  },
+  ["Ecoterrorist"] = {
+    action = "User Action 3",
+    cost = 90,
+    consuming = true,
+    counter = "Injunction",
+    telemetry = "sabotage_tile",
+    success = function(actor, tile)
+      return 0.65
+    end,
+    effect = function(actor, tile)
+      -- Tear down the most developed improvement first; if the tile is
+      -- bare, foul it with pollution instead.
+      local order = {
+        "Farmland", "Kelp Farm", "Oil Platform", "Oil Well", "Mine",
+        "Irrigation", "Maglev", "Railroad", "Sea Tunnel", "Road",
+      }
+      -- NOTE: loop var must NOT be "_" -- that would shadow the gettext
+      -- function called inside the loop body (a number is not callable).
+      for oi, name in ipairs(order) do
+        if tile:has_extra(name) then
+          edit.remove_extra(tile, name)
+          notify.event(actor.owner, tile, E.SCRIPT,
+            _("Sabotage! The %s at (%d, %d) has been destroyed."),
+            name, tile.x, tile.y)
+          if tile.owner ~= nil then
+            notify.event(tile.owner, tile, E.SCRIPT,
+              _("Ecoterrorists have destroyed the %s at (%d, %d)!"),
+              name, tile.x, tile.y)
+          end
+          return
+        end
+      end
+      edit.create_extra(tile, "Pollution")
+      notify.event(actor.owner, tile, E.SCRIPT,
+        _("Nothing to dismantle -- the operatives befoul the tile instead."))
+    end,
+  },
+  ["Lawyer"] = {
+    action = "User Action 4",
+    cost = 60,
+    consuming = true,
+    counter = nil,   -- injunctions do not block filing injunctions
+    telemetry = "file_injunction",
+    success = function(actor, target)
+      return 1.0    -- filing always succeeds; the price is gold + the unit
+    end,
+    effect = function(actor, target)
+      epoch_place_injunction(actor.tile, EPOCH_CONFIG.special.injunction_turns)
+      notify.event(actor.owner, actor.tile, E.SCRIPT,
+        _("Injunction filed: this tile is legally shielded for %d turns."),
+        EPOCH_CONFIG.special.injunction_turns)
+    end,
+  },
+}
+
+-- ---- The shared runner (design doc section 3) ---------------------------
+-- Server-authoritative: guard -> charge -> roll -> apply -> consume ->
+-- telemetry. Aborted guards notify and charge NOTHING.
+function epoch_run_special(reg, actor, target, tile, tdesc)
+  local player = actor.owner
+  local uname = actor.utype:name_translation()
+  -- Guard 1: counter-injunction on the target tile (abort, no charge).
+  if reg.counter ~= nil and tile ~= nil and tile:has_extra(reg.counter) then
+    notify.event(player, tile, E.SCRIPT,
+      _("%s: the operation is blocked by a standing legal injunction."),
+      uname)
+    log.normal(string.format(
+      "[EPOCH][special_action] action=%s actor_type=%s actor=%d target=%s blocked=injunction turn=%d",
+      reg.telemetry, actor.utype:rule_name(), actor.id, tdesc,
+      epoch_current_turn))
+    return
+  end
+  -- Guard 2: affordability (abort, no charge).
+  local gold = player:gold()
+  if gold < reg.cost then
+    notify.event(player, tile, E.SCRIPT,
+      _("%s: not enough gold (%d needed, %d available)."),
+      uname, reg.cost, gold)
+    log.normal(string.format(
+      "[EPOCH][special_action] action=%s actor_type=%s actor=%d target=%s blocked=gold turn=%d",
+      reg.telemetry, actor.utype:rule_name(), actor.id, tdesc,
+      epoch_current_turn))
+    return
+  end
+  -- Charge.
+  edit.change_gold(player, -reg.cost)
+  -- Roll — ruleset-global seeded RNG, MP-deterministic.
+  local pct = math.floor(reg.success(actor, target) * 100)
+  local ok = random(1, 100) <= pct
+  -- Apply.
+  if ok then
+    reg.effect(actor, target)
+  else
+    notify.event(player, tile, E.SCRIPT,
+      _("%s: the operation failed (%d gold spent)."), uname, reg.cost)
+  end
+  -- Telemetry (before consumption so actor fields are still valid).
+  log.normal(string.format(
+    "[EPOCH][special_action] action=%s actor_type=%s actor=%d target=%s success=%s cost=%d turn=%d",
+    reg.telemetry, actor.utype:rule_name(), actor.id, tdesc, tostring(ok),
+    reg.cost, epoch_current_turn))
+  -- Consume LAST — unithand.c re-checks unit_is_alive after this handler.
+  if reg.consuming then
+    edit.unit_kill(actor, "used", nil)
+  end
+end
+
+-- ---- Slot handlers -------------------------------------------------------
+-- Slot 1 (City): Cleric, Corporate Branch.
+function epoch_civic_op(action, actor, target_city)
+  if action:rule_name() ~= "User Action 1" then return end
+  local reg = EPOCH_SPECIAL[actor.utype:rule_name()]
+  if reg == nil or reg.action ~= "User Action 1" then return end
+  epoch_run_special(reg, actor, target_city, target_city.tile,
+                    string.format("city=%d", target_city.id))
+end
+signal.connect("action_started_unit_city", "epoch_civic_op")
+
+-- Slot 3 (Tile): SECOND handler on action_started_unit_tile, coexisting
+-- with epoch_commission_works above. Each guards on its own flags: PW
+-- early-returns unless the actor has PublicWorks; this one early-returns
+-- FOR PublicWorks units and for any type not in the registry.
+function epoch_field_op_special(action, actor, target_tile)
+  if action:rule_name() ~= "User Action 3" then return end
+  if actor.utype:has_flag("PublicWorks") then return end
+  local reg = EPOCH_SPECIAL[actor.utype:rule_name()]
+  if reg == nil or reg.action ~= "User Action 3" then return end
+  epoch_run_special(reg, actor, target_tile, target_tile,
+                    string.format("tile=%d", target_tile.id))
+end
+signal.connect("action_started_unit_tile", "epoch_field_op_special")
+
+-- Slot 4 (Self): Lawyer. Self actions have no target; the tile is the
+-- actor's own.
+function epoch_legal_injunction(action, actor)
+  if action:rule_name() ~= "User Action 4" then return end
+  local reg = EPOCH_SPECIAL[actor.utype:rule_name()]
+  if reg == nil or reg.action ~= "User Action 4" then return end
+  epoch_run_special(reg, actor, nil, actor.tile, "self")
+end
+signal.connect("action_started_unit_self", "epoch_legal_injunction")
