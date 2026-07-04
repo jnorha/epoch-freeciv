@@ -2161,6 +2161,98 @@ reqs    =
       "OutputType", "Shield", "Local", TRUE
     }
 
+; ---------------------------------------------------------------------------
+; Epoch — future-age ordinary building effects (the "hollow future build" fill).
+; ---------------------------------------------------------------------------
+; Gene Clinic (Helix) — city health + one content citizen
+[effect_gene_clinic_health]
+type    = "Health_Pct"
+value   = 30
+reqs    =
+    { "type", "name", "range"
+      "Building", "Gene Clinic", "City"
+    }
+
+[effect_gene_clinic_content]
+type    = "Make_Content"
+value   = 1
+reqs    =
+    { "type", "name", "range", "present"
+      "Building", "Gene Clinic", "City", TRUE
+    }
+
+; Biosphere Dome (Helix) — sealed ecology: contentment + pollution scrub
+[effect_biosphere_dome_content]
+type    = "Make_Content"
+value   = 2
+reqs    =
+    { "type", "name", "range", "present"
+      "Building", "Biosphere Dome", "City", TRUE
+    }
+
+[effect_biosphere_dome_pollution]
+type    = "Pollu_Pop_Pct"
+value   = -35
+reqs    =
+    { "type", "name", "range"
+      "Building", "Biosphere Dome", "City"
+    }
+
+; Cognition Hub (Helix) — +50% science (extends Research Lab)
+[effect_cognition_hub]
+type    = "Output_Bonus"
+value   = 50
+reqs    =
+    { "type", "name", "range"
+      "Building", "Cognition Hub", "City"
+      "OutputType", "Science", "Local"
+    }
+
+; Nanofabricator (Lattice) — +50% production (extends Factory)
+[effect_nanofabricator]
+type    = "Output_Bonus"
+value   = 50
+reqs    =
+    { "type", "name", "range"
+      "Building", "Nanofabricator", "City"
+      "OutputType", "Shield", "Local"
+    }
+
+; Living Arcology (Lattice) — grown habitat: contentment + pollution scrub
+[effect_living_arcology_content]
+type    = "Make_Content"
+value   = 3
+reqs    =
+    { "type", "name", "range", "present"
+      "Building", "Living Arcology", "City", TRUE
+    }
+
+[effect_living_arcology_pollution]
+type    = "Pollu_Pop_Pct"
+value   = -25
+reqs    =
+    { "type", "name", "range"
+      "Building", "Living Arcology", "City"
+    }
+
+; Neural Exchange (Lattice) — +50% science + martial order (extends Cognition Hub)
+[effect_neural_exchange_science]
+type    = "Output_Bonus"
+value   = 50
+reqs    =
+    { "type", "name", "range"
+      "Building", "Neural Exchange", "City"
+      "OutputType", "Science", "Local"
+    }
+
+[effect_neural_exchange_order]
+type    = "Make_Content_Mil"
+value   = 2
+reqs    =
+    { "type", "name", "range", "present"
+      "Building", "Neural Exchange", "City", TRUE
+    }
+
 ; Epoch 2.2 — Kelp Farm tile extra: per-tile food + trade on the shelf, built by
 ; Undersea Workers. Stacks on top of the city-wide Harbor/Aquaculture bonuses.
 [effect_kelp_farm_food]

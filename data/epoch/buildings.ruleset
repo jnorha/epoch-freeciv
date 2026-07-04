@@ -668,6 +668,166 @@ production. It is the undersea answer to the Factory. Requires Fusion \
 Lattices.\
 ")
 
+; ==========================================================================
+; Epoch — future-age ORDINARY buildings (fills the "hollow future build queue"
+; gap: before these, a Helix/Lattice inland city still built only the Dynamo
+; stack). Six city improvements gated on future techs, each a distinct role and
+; several chaining onto an existing building so they read as era extensions.
+; Placeholder graphics (b.<name> primary, stock tag as graphic_alt) pending an
+; art batch. Effects live in effects.ruleset ([effect_<name>*]).
+; --- Helix IV (the biological turn) ---
+; ==========================================================================
+[building_gene_clinic]
+name		= _("Gene Clinic")
+genus		= "Improvement"
+reqs	=
+    { "type", "name", "range"
+      "Tech", "Cellular Rewriting", "Player"
+    }
+graphic         = "b.gene_clinic"
+graphic_alt     = "b.aqueduct"
+graphic_alt2    = "-"
+obsolete_by	=
+    { "type", "name", "range"
+    }
+build_cost	= 110
+upkeep		= 2
+sabotage	= 100
+sound           = "b_generic"
+sound_alt       = "b_generic"
+helptext	= _("\
+A Helix-age clinic where gene-level medicine holds plague at bay and keeps a \
+crowded population healthy. Reduces the risk of illness in the city and makes \
+one unhappy citizen content. Requires Cellular Rewriting.\
+")
+
+[building_biosphere_dome]
+name		= _("Biosphere Dome")
+genus		= "Improvement"
+reqs	=
+    { "type", "name", "range"
+      "Tech", "Closed Biospheres", "Player"
+    }
+graphic         = "b.biosphere_dome"
+graphic_alt     = "b.mass_transit"
+graphic_alt2    = "-"
+obsolete_by	=
+    { "type", "name", "range"
+    }
+build_cost	= 130
+upkeep		= 2
+sabotage	= 100
+sound           = "b_generic"
+sound_alt       = "b_generic"
+helptext	= _("\
+A sealed solarpunk arcology: a self-contained ecology under glass that keeps \
+citizens content and scrubs the city's pollution. Makes two unhappy citizens \
+content and sharply cuts population pollution. Requires Closed Biospheres.\
+")
+
+[building_cognition_hub]
+name		= _("Cognition Hub")
+genus		= "Improvement"
+reqs	=
+    { "type", "name", "range"
+      "Tech", "Machine Cognition", "Player"
+      "Building", "Research Lab", "City"
+    }
+graphic         = "b.cognition_hub"
+graphic_alt     = "b.research_lab"
+graphic_alt2    = "-"
+obsolete_by	=
+    { "type", "name", "range"
+    }
+build_cost	= 160
+upkeep		= 3
+sabotage	= 100
+sound           = "b_generic"
+sound_alt       = "b_generic"
+helptext	= _("\
+Learning machines augment every researcher in the city. An extension of the \
+Research Lab that adds a further 50% to the city's science output. Requires a \
+Research Lab and Machine Cognition.\
+")
+
+; ==========================================================================
+; --- Lattice V (programmable matter) ---
+; ==========================================================================
+[building_nanofabricator]
+name		= _("Nanofabricator")
+genus		= "Improvement"
+reqs	=
+    { "type", "name", "range"
+      "Tech", "Adaptive Fabrication", "Player"
+      "Building", "Factory", "City"
+    }
+graphic         = "b.nanofabricator"
+graphic_alt     = "b.mfg_plant"
+graphic_alt2    = "-"
+obsolete_by	=
+    { "type", "name", "range"
+    }
+build_cost	= 200
+upkeep		= 3
+sabotage	= 100
+sound           = "b_factory"
+sound_alt       = "b_generic"
+helptext	= _("\
+Self-configuring molecular assembly lines rebuild the city's industry from the \
+atom up. A Lattice-age extension of the Factory that adds a further 50% to the \
+city's production. Requires a Factory and Adaptive Fabrication.\
+")
+
+[building_living_arcology]
+name		= _("Living Arcology")
+genus		= "Improvement"
+reqs	=
+    { "type", "name", "range"
+      "Tech", "Living Architecture", "Player"
+      "Building", "Biosphere Dome", "City"
+    }
+graphic         = "b.living_arcology"
+graphic_alt     = "b.solar_plant"
+graphic_alt2    = "-"
+obsolete_by	=
+    { "type", "name", "range"
+    }
+build_cost	= 220
+upkeep		= 3
+sabotage	= 100
+sound           = "b_generic"
+sound_alt       = "b_generic"
+helptext	= _("\
+A living, self-repairing megastructure grown rather than built — the peak of \
+solarpunk habitation. Makes three unhappy citizens content and further cleans \
+the city's air. Requires a Biosphere Dome and Living Architecture.\
+")
+
+[building_neural_exchange]
+name		= _("Neural Exchange")
+genus		= "Improvement"
+reqs	=
+    { "type", "name", "range"
+      "Tech", "Neural Uplink", "Player"
+      "Building", "Cognition Hub", "City"
+    }
+graphic         = "b.neural_exchange"
+graphic_alt     = "b.research_lab"
+graphic_alt2    = "-"
+obsolete_by	=
+    { "type", "name", "range"
+    }
+build_cost	= 240
+upkeep		= 4
+sabotage	= 100
+sound           = "b_generic"
+sound_alt       = "b_generic"
+helptext	= _("\
+Citizens' minds are woven into a shared cognitive network. Adds a further 50% \
+to the city's science and keeps the populace orderly under the hum of the \
+collective. Requires a Cognition Hub and Neural Uplink.\
+")
+
 [building_hydro_plant]
 name		= _("Hydro Plant")
 genus		= "Improvement"
