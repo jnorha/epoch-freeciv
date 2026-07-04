@@ -991,6 +991,82 @@ EPOCH_SPECIAL = {
         EPOCH_CONFIG.special.injunction_turns)
     end,
   },
+  -- ---- Roster part 2 (backlog 2.3): enslave/free + more ----
+  ["Slaver"] = {
+    action = "User Action 1",
+    cost = 100,
+    consuming = true,
+    counter = "Injunction",
+    telemetry = "raid_city",
+    -- Only cities big enough to lose a point (a size-1 raid would erase it).
+    guard = function(actor, city) return city.size >= 2 end,
+    guard_msg = _("The city is too small to raid for labour."),
+    success = function(actor, city)
+      return epoch_clamp(0.70 - 0.04 * city.size, 0.10, 0.85)
+    end,
+    effect = function(actor, city)
+      local cname = city.name
+      local ctile = city.tile
+      -- change_city_size in this build takes (city, delta, by_player).
+      edit.change_city_size(city, -1, actor.owner)
+      actor.owner:create_unit(actor.tile, find.unit_type("Workers"), 0, nil, -1)
+      notify.event(actor.owner, ctile, E.SCRIPT,
+        _("Your Slaver raids %s: captured labour joins you as a Workers unit."),
+        cname)
+      notify.event(city.owner, ctile, E.SCRIPT,
+        _("Slavers have raided %s and carried off its people!"), cname)
+    end,
+  },
+  ["Televangelist"] = {
+    action = "User Action 1",
+    cost = 30,
+    consuming = false,   -- a travelling preacher; repeatable
+    counter = "Injunction",
+    telemetry = "mass_sermon",
+    success = function(actor, city) return 0.80 end,
+    effect = function(actor, city)
+      local tithe = 20 + 8 * city.size
+      edit.change_gold(actor.owner, tithe)
+      notify.event(actor.owner, city.tile, E.SCRIPT,
+        _("Your Televangelist preaches in %s: %d gold in donations."),
+        city.name, tithe)
+    end,
+  },
+  ["Subverter"] = {
+    action = "User Action 2",
+    cost = 110,
+    consuming = true,
+    counter = "Injunction",
+    telemetry = "bribe_unit",
+    success = function(actor, tgt) return 0.55 end,
+    effect = function(actor, tgt)
+      local ttype = tgt.utype
+      local ttile = tgt.tile
+      local tname = ttype:name_translation()
+      -- The unit defects: destroy the original, raise an identical one for us.
+      edit.unit_kill(tgt, "used", nil)
+      actor.owner:create_unit(ttile, ttype, 0, nil, -1)
+      notify.event(actor.owner, ttile, E.SCRIPT,
+        _("Your Subverter bribes an enemy %s: it defects to your side!"), tname)
+    end,
+  },
+  ["Abolitionist"] = {
+    action = "User Action 2",
+    cost = 40,
+    consuming = true,
+    counter = "Injunction",
+    telemetry = "free_labour",
+    guard = function(actor, tgt) return tgt.utype:has_flag("Workers") end,
+    guard_msg = _("Abolitionists can only free labour units (Workers, Migrants, Engineers)."),
+    success = function(actor, tgt) return 0.85 end,
+    effect = function(actor, tgt)
+      local ttile = tgt.tile
+      edit.unit_kill(tgt, "used", nil)
+      actor.owner:create_unit(ttile, find.unit_type("Migrants"), 0, nil, -1)
+      notify.event(actor.owner, ttile, E.SCRIPT,
+        _("Your Abolitionist frees the labourers; they emigrate to you as Migrants."))
+    end,
+  },
 }
 
 -- ---- The shared runner (design doc section 3) ---------------------------
@@ -1006,6 +1082,17 @@ function epoch_run_special(reg, actor, target, tile, tdesc)
       uname)
     log.normal(string.format(
       "[EPOCH][special_action] action=%s actor_type=%s actor=%d target=%s blocked=injunction turn=%d",
+      reg.telemetry, actor.utype:rule_name(), actor.id, tdesc,
+      epoch_current_turn))
+    return
+  end
+  -- Guard 1b: optional per-op precondition, e.g. Abolitionist's target must be
+  -- a labour unit (abort, no charge). reg.guard(actor, target) -> bool.
+  if reg.guard ~= nil and not reg.guard(actor, target) then
+    notify.event(player, tile, E.SCRIPT,
+      reg.guard_msg or _("The operation cannot be performed on this target."))
+    log.normal(string.format(
+      "[EPOCH][special_action] action=%s actor_type=%s actor=%d target=%s blocked=guard turn=%d",
       reg.telemetry, actor.utype:rule_name(), actor.id, tdesc,
       epoch_current_turn))
     return
@@ -1079,3 +1166,14 @@ function epoch_legal_injunction(action, actor)
   epoch_run_special(reg, actor, nil, actor.tile, "self")
 end
 signal.connect("action_started_unit_self", "epoch_legal_injunction")
+
+-- Slot 2 (Unit): Subverter, Abolitionist. Target is a foreign unit; the tile
+-- passed to the runner (for the injunction check) is that unit's tile.
+function epoch_covert_op(action, actor, target_unit)
+  if action:rule_name() ~= "User Action 2" then return end
+  local reg = EPOCH_SPECIAL[actor.utype:rule_name()]
+  if reg == nil or reg.action ~= "User Action 2" then return end
+  epoch_run_special(reg, actor, target_unit, target_unit.tile,
+                    string.format("unit=%d", target_unit.id))
+end
+signal.connect("action_started_unit_unit", "epoch_covert_op")

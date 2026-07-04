@@ -50,6 +50,10 @@ flags =
     _("SpecLawyer"), _("Can file a legal injunction that blocks hostile special operations.")
     _("SpecCorp"), _("Can franchise foreign cities for gold (Civic Operation).")
     _("SpecEco"), _("Can sabotage tile improvements (Field Operation).")
+    _("SpecSlaver"), _("Can raid a foreign city's population for captured labour (Civic Operation).")
+    _("SpecTelevangelist"), _("Can preach for donations in foreign cities (Civic Operation).")
+    _("SpecSubverter"), _("Can bribe a foreign unit to defect (Covert Operation).")
+    _("SpecAbolitionist"), _("Can free labour from a foreign unit (Covert Operation).")
   }
 
 ; Names for custom unit class flags. There can be up to 25 of these.
@@ -988,6 +992,178 @@ an adjacent tile to destroy its most developed improvement -- farmland, \
 mines, rails -- or, failing that, to foul the tile with pollution. The \
 operative disappears underground after the strike, successful or not. A \
 legal Injunction on the tile blocks the operation.\
+")
+
+; --- Epoch special-action roster, part 2 (backlog 2.3) — enslave/free + more.
+; All Small Land civilians on the special-action framework (script.lua
+; EPOCH_SPECIAL). Gold-costed, gov-gated (actions.ruleset). Placeholder
+; graphics (stock diplomat/spy/migrants tags) pending art.
+[unit_slaver]
+name          = _("Slaver")
+class         = "Small Land"
+reqs          =
+  { "type", "name", "range"
+    "Tech", "Monarchy", "Player"
+  }
+obsolete_by   = "None"
+graphic       = "u.migrants"
+graphic_alt   = "u.settlers"
+sound_move    = "m_generic"
+sound_move_alt = "m_generic"
+sound_fight   = "f_generic"
+sound_fight_alt = "f_generic"
+build_cost    = 40
+pop_cost      = 0
+attack        = 0
+defense       = 1
+hitpoints     = 10
+firepower     = 1
+move_rate     = 2
+vision_radius_sq = 2
+transport_cap = 0
+fuel          = 0
+uk_happy      = 0
+uk_shield     = 1
+uk_food       = 0
+uk_gold       = 0
+tp_defense    = "Alight"
+flags         = "SpecSlaver", "NonMil", "HasNoZOC", "Cant_Fortify", "NoVeteran"
+veteran_names = _("green")
+veteran_base_raise_chance = 0
+veteran_work_raise_chance = 0
+veteran_power_fact = 100
+veteran_move_bonus = 0
+helptext      = _("\
+Slavers raid a foreign city for forced labour. Order a Civic Operation next \
+to a foreign city: on success the city loses a population point and you gain \
+a captured Workers unit. The attempt costs gold and the Slaver is spent \
+either way. Enlightened governments forbid the practice.\
+")
+
+[unit_televangelist]
+name          = _("Televangelist")
+class         = "Small Land"
+reqs          =
+  { "type", "name", "range"
+    "Tech", "Theology", "Player"
+  }
+obsolete_by   = "None"
+graphic       = "u.diplomat"
+graphic_alt   = "-"
+sound_move    = "m_diplomat"
+sound_move_alt = "m_generic"
+sound_fight   = "f_diplomat"
+sound_fight_alt = "f_generic"
+build_cost    = 30
+pop_cost      = 0
+attack        = 0
+defense       = 1
+hitpoints     = 10
+firepower     = 1
+move_rate     = 2
+vision_radius_sq = 2
+transport_cap = 0
+fuel          = 0
+uk_happy      = 0
+uk_shield     = 1
+uk_food       = 0
+uk_gold       = 1
+tp_defense    = "Alight"
+flags         = "SpecTelevangelist", "NonMil", "HasNoZOC", "Cant_Fortify", "NoVeteran"
+veteran_names = _("green")
+veteran_base_raise_chance = 0
+veteran_work_raise_chance = 0
+veteran_power_fact = 100
+veteran_move_bonus = 0
+helptext      = _("\
+Televangelists preach for donations in foreign cities. Order a Civic \
+Operation next to a foreign city to skim gold from the faithful, scaled by \
+the city's size. Cheaper than a Corporate Branch and repeatable — the \
+preacher is not consumed. Secular governments have no congregation to work.\
+")
+
+[unit_subverter]
+name          = _("Subverter")
+class         = "Small Land"
+reqs          =
+  { "type", "name", "range"
+    "Tech", "Espionage", "Player"
+  }
+obsolete_by   = "None"
+graphic       = "u.spy"
+graphic_alt   = "u.diplomat"
+sound_move    = "m_spy"
+sound_move_alt = "m_generic"
+sound_fight   = "f_spy"
+sound_fight_alt = "f_generic"
+build_cost    = 50
+pop_cost      = 0
+attack        = 0
+defense       = 1
+hitpoints     = 10
+firepower     = 1
+move_rate     = 2
+vision_radius_sq = 2
+transport_cap = 0
+fuel          = 0
+uk_happy      = 0
+uk_shield     = 1
+uk_food       = 0
+uk_gold       = 1
+tp_defense    = "Alight"
+flags         = "SpecSubverter", "NonMil", "HasNoZOC", "Cant_Fortify", "NoVeteran"
+veteran_names = _("green")
+veteran_base_raise_chance = 0
+veteran_work_raise_chance = 0
+veteran_power_fact = 100
+veteran_move_bonus = 0
+helptext      = _("\
+Subverters bribe a foreign unit to defect. Order a Covert Operation on an \
+adjacent enemy unit: on success it changes sides and joins your forces. The \
+attempt costs gold and the Subverter is spent either way. Accountable \
+governments will not sanction it.\
+")
+
+[unit_abolitionist]
+name          = _("Abolitionist")
+class         = "Small Land"
+reqs          =
+  { "type", "name", "range"
+    "Tech", "Democracy", "Player"
+  }
+obsolete_by   = "None"
+graphic       = "u.migrants"
+graphic_alt   = "u.settlers"
+sound_move    = "m_generic"
+sound_move_alt = "m_generic"
+sound_fight   = "f_generic"
+sound_fight_alt = "f_generic"
+build_cost    = 30
+pop_cost      = 0
+attack        = 0
+defense       = 1
+hitpoints     = 10
+firepower     = 1
+move_rate     = 2
+vision_radius_sq = 2
+transport_cap = 0
+fuel          = 0
+uk_happy      = 0
+uk_shield     = 1
+uk_food       = 0
+uk_gold       = 0
+tp_defense    = "Alight"
+flags         = "SpecAbolitionist", "NonMil", "HasNoZOC", "Cant_Fortify", "NoVeteran"
+veteran_names = _("green")
+veteran_base_raise_chance = 0
+veteran_work_raise_chance = 0
+veteran_power_fact = 100
+veteran_move_bonus = 0
+helptext      = _("\
+Abolitionists free labour held by a foreign unit. Order a Covert Operation \
+on an adjacent enemy Workers, Migrants, or Engineers unit: on success it is \
+disbanded and freed people emigrate to you as a Migrants unit. The \
+Abolitionist is spent on the attempt.\
 ")
 
 [unit_warriors]

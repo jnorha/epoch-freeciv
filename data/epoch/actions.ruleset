@@ -464,6 +464,17 @@ user_action_4_min_range              = 0
 user_action_4_max_range              = 0
 user_action_4_actor_consuming_always = FALSE
 
+; Slot 2 -- the Unit slot ("Covert Operation"): Subverter (bribe a unit to
+; defect) and Abolitionist (free labour from a unit) today. Like the other
+; slots, actor_consuming_always stays FALSE and consumption is per-unit in Lua
+; (epoch_run_special). Handler epoch_covert_op guards on the actor's Spec flag.
+; /* TRANS: _Covert Operation (100% chance of success). */
+ui_name_user_action_2                = _("%sCovert Operation%s")
+user_action_2_target_kind            = "Unit"
+user_action_2_min_range              = 1
+user_action_2_max_range              = 1
+user_action_2_actor_consuming_always = FALSE
+
 ; Some actions have a action dice roll before the action starts where it can
 ; fail. The initial probability of success is 100% unless the action appears
 ; in the following list. Then the initial probability comes from the setting
@@ -1649,4 +1660,49 @@ actor_reqs    =
       "Gov",          "Anarchy",    "Player", FALSE
       "Gov",          "Tribal",     "Player", FALSE
       "Gov",          "Despotism",  "Player", FALSE
+    }
+
+; --- Special-action roster part 2 (backlog 2.3) ---
+; Slaver (slot 1 City) — raid a foreign city; barred under enlightened govs.
+[enabler_spec_slaver_raid]
+action        = "User Action 1"
+actor_reqs    =
+    { "type",         "name",        "range",  "present"
+      "UnitTypeFlag", "SpecSlaver",  "Local",  TRUE
+      "MinMoveFrags", "1",           "Local",  TRUE
+      "DiplRel",      "Foreign",     "Local",  TRUE
+      "Gov",          "Democracy",   "Player", FALSE
+      "Gov",          "Stewardship", "Player", FALSE
+    }
+
+; Televangelist (slot 1 City) — preach for donations; no flock under Synthesis.
+[enabler_spec_televangelist_sermon]
+action        = "User Action 1"
+actor_reqs    =
+    { "type",         "name",              "range",  "present"
+      "UnitTypeFlag", "SpecTelevangelist", "Local",  TRUE
+      "MinMoveFrags", "1",                 "Local",  TRUE
+      "DiplRel",      "Foreign",           "Local",  TRUE
+      "Gov",          "Synthesis",         "Player", FALSE
+    }
+
+; Subverter (slot 2 Unit) — bribe a foreign unit to defect; not under Democracy.
+[enabler_spec_subverter_bribe]
+action        = "User Action 2"
+actor_reqs    =
+    { "type",         "name",          "range",  "present"
+      "UnitTypeFlag", "SpecSubverter", "Local",  TRUE
+      "MinMoveFrags", "1",             "Local",  TRUE
+      "DiplRel",      "Foreign",       "Local",  TRUE
+      "Gov",          "Democracy",     "Player", FALSE
+    }
+
+; Abolitionist (slot 2 Unit) — free labour from a foreign unit; universally OK.
+[enabler_spec_abolitionist_free]
+action        = "User Action 2"
+actor_reqs    =
+    { "type",         "name",            "range", "present"
+      "UnitTypeFlag", "SpecAbolitionist","Local", TRUE
+      "MinMoveFrags", "1",               "Local", TRUE
+      "DiplRel",      "Foreign",         "Local", TRUE
     }
