@@ -28,6 +28,7 @@ Two independent controls, both required:
 | **DO Cloud Firewall** | Closes every port except 22/80/443 at the network edge. **This is the authoritative port lock** — `ufw` cannot block Docker-published ports (8080, 4002, 6000-7009, 8888), Docker's iptables bypass it. | DO dashboard |
 | **Caddy + basic_auth** | Puts a shared-password prompt in front of the game. The only public HTTP door (80/443) is locked. | `Caddyfile.example` |
 | SSH hardening | Key-only auth, no password login, fail2ban, auto security updates. Defense-in-depth for admin access. | `harden-droplet.sh` |
+| Dedicated deploy user | GitHub Actions deploys as a scoped `epochdeploy` user (docker-group + `/opt/epoch` ownership only), not root. Smaller blast radius if the deploy key ever leaks. | `create-deploy-user.sh` |
 
 ---
 
@@ -49,6 +50,34 @@ ssh root@<DROPLET_IP> 'bash /root/harden-droplet.sh'
 ```
 Then, from a **second** terminal, verify you can still open a fresh SSH session.
 Only once that works should you trust the change.
+
+### 2b. Dedicated deploy user (instead of root for GitHub Actions)
+Generate a deploy-only key pair on your machine (never reuse your personal key):
+```bash
+ssh-keygen -t ed25519 -f epoch_deploy -N ''
+```
+Copy the **public** half to the droplet and run the setup script as root:
+```bash
+scp epoch_deploy.pub root@<DROPLET_IP>:/root/
+scp ops/droplet/create-deploy-user.sh root@<DROPLET_IP>:/root/
+ssh root@<DROPLET_IP> 'bash /root/create-deploy-user.sh /root/epoch_deploy.pub'
+```
+This creates a locked-password `epochdeploy` user, in the `docker` group (needed
+for `docker compose` without sudo — note this is root-equivalent for the whole
+host via the Docker socket, a Docker-wide caveat, not something this setup can
+avoid if the deploy needs to run `docker compose build/up`), owning `/opt/epoch`.
+
+Verify: `ssh -i epoch_deploy epochdeploy@<DROPLET_IP> 'docker compose -f /opt/epoch/docker-compose.yml ps'`
+should work with **no password prompt**.
+
+Then in the GitHub repo secrets (Settings → Secrets and variables → Actions):
+  - `DO_USER` = `epochdeploy` (not `root`)
+  - `DO_SSH_KEY` = the full contents of the **private** `epoch_deploy` file
+  - `DO_HOST` = the droplet's IP
+
+Delete your local `epoch_deploy`/`epoch_deploy.pub` files once both halves are
+placed — don't leave the private key sitting in a working directory, and never
+commit it (it should never be added to the repo at all).
 
 ### 3. Caddy password gate
 On the droplet:

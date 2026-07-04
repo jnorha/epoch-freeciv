@@ -42,6 +42,10 @@ key at creation** (don't rely on password auth). The new droplet boots with a
 - **GitHub secret**: repo → Settings → Secrets and variables → Actions →
   update **`DO_HOST`** to the new IP (or the Reserved IP). The deploy workflow
   re-scans the host key each run (`ssh-keyscan`), so nothing else changes there.
+- **Deploy user**: the snapshot carries over the `epochdeploy` user + its
+  authorized key if you'd already run `create-deploy-user.sh` on the old
+  droplet before snapshotting (nothing to redo). If not, run it now on the new
+  droplet — see `README.md` §2b — and update `DO_USER`/`DO_SSH_KEY` accordingly.
 - **Your `~/.ssh/known_hosts`**: remove the stale old-IP line to avoid a host-key
   mismatch warning: `ssh-keygen -R <OLD_IP>` (and `-R <NEW_IP>` is unnecessary;
   it'll be added on first connect).
