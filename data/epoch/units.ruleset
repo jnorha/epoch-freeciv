@@ -576,6 +576,49 @@ the continental shelf (shallow Ocean), founding undersea cities where no land \
 Settler can reach. Deep Ocean and inland Lakes remain uninhabitable.\
 ")
 
+[unit_undersea_worker]
+name          = _("Undersea Worker")
+class         = "Sea"
+reqs          =
+  { "type", "name", "range"
+    "Tech", "Abyssal Engineering", "Player"
+  }
+obsolete_by   = "None"
+graphic       = "u.workers"
+graphic_alt   = "u.engineers"
+sound_move    = "m_generic"
+sound_move_alt = "m_generic"
+sound_fight   = "f_generic"
+sound_fight_alt = "f_generic"
+build_cost    = 40
+pop_cost      = 0
+attack        = 0
+defense       = 1
+hitpoints     = 20
+firepower     = 1
+move_rate     = 4
+vision_radius_sq = 2
+transport_cap = 0
+fuel          = 0
+uk_happy      = 0
+uk_shield     = 0
+uk_food       = 1
+uk_gold       = 0
+tp_defense    = "Alight"
+flags         = "Workers", "NonMil", "Cant_Fortify", "HasNoZOC", "BadCityDefender"
+; No veteran levels
+veteran_names = _("green")
+veteran_base_raise_chance = 0
+veteran_work_raise_chance = 0
+veteran_power_fact = 100
+veteran_move_bonus = 0
+helptext      = _("\
+An ocean-native engineering unit unlocked by Abyssal Engineering. The Undersea \
+Worker develops the seafloor its land-bound cousins cannot reach: cultivating \
+Kelp Farms, laying Sea Tunnels, and planting Buoys and undersea platforms on \
+the continental shelf.\
+")
+
 [unit_migrants]
 name          = _("Migrants")
 class         = "Small Land"

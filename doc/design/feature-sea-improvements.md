@@ -149,10 +149,35 @@ buildings alone: **food** (Harbor→Aquaculture→Deep Habitat) · **size** (Aqu
 **stability** (Temple + Deep Habitat content + Marketplace) · **production** (Offshore Platform→
 Abyssal Foundry). All of these are buildable by an undersea city (coastal/ocean-adjacent by nature).
 
-**Deferred (rest of 2.2):** the **Undersea Worker** unit + *tile* improvements it builds (Kelp Farm
-food/trade extra via the proven `causes="Base"` Buoy pattern; Undersea Mine via Oil Platform);
-solarpunk arrays. These add per-tile variety + Public-Works flavour on top of the (already complete)
-building ladder — a want, not a need.
+### 5d. Undersea Worker + Kelp Farm tile improvement (✅ 2026-07-04)
+Added the ocean-native civilian and its first buildable tile improvement, giving per-tile
+development on top of the city-wide building ladder.
+- **Undersea Worker** (`[unit_undersea_worker]`, unit #70) — `Sea` class + `Workers` flag,
+  `Tech "Abyssal Engineering"`. Develops the seafloor land Workers can't reach.
+- **Kelp Farm** (`[extra_kelp_farm]`, `causes="Base"` + paired `[base_kelp_farm]`) — reqs
+  `Pressure Ecology` + `TerrainClass Oceanic` + `UnitTypeFlag Workers` (+ not city-center).
+  `[effect_kelp_farm_food]` / `[effect_kelp_farm_trade]` = `Output_Inc_Tile +1` each, so a
+  developed shelf tile yields +1 food **and** +1 trade, stacking on the Harbor/Aquaculture
+  building bonuses.
+
+**Why `Base` and not `Mine`/`Irrigation`:** the ocean-buildable causes are constrained by
+`TerrainAlter` gates — shallow ocean has neither `CanMine` nor `CanIrrigate` (their `*_time` are 0),
+and the stock `Build Mine` enablers even exclude `Sea` class. **`Base` is the one cause that builds
+on ocean with no terrain-alter gating** (the shipped Buoy proves it; `Build Base` has empty
+actor-reqs and ocean has `CanBase`), so it's the clean path for any ocean resource extra. Note the
+same paired-section rule as roads: a `causes="Base"` extra needs a `[base_<tag>]` twin or the load
+fails.
+
+**Spike — PASS end-to-end:** worker `can_build_direct` false→true across Abyssal Engineering;
+creatable on ocean; Kelp Farm edit-places (`has_extra` true); and the real path works — the worker's
+`perform_action(find.action("Build Base"), tile, "Kelp Farm")` returned true and the **Kelp Farm
+appeared on the next turn** (build_time 3 activity). So undersea tile development is fully functional
+in normal play, not just via `edit`.
+
+**Deferred (rest of 2.2):** Undersea Mine for shelf shields (needs either an ocean `CanMine` tweak
+or a `Base`-cause shield extra); solarpunk energy arrays (Lattice); Public-Works "Commission Works"
+placement of these same extras (`feature-pw-placement.md`). All are additive polish — the undersea
+growth path (buildings) + first tile improvement (Kelp Farm) are shipped and proven.
 
 ## 6. Open questions
 - **Sea Tunnel movement semantics:** does `causes="Road"` on ocean grant the road move bonus, or

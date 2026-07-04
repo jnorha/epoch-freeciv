@@ -1770,6 +1770,37 @@ A pressurized seafloor corridor. Sea Tunnels speed undersea and naval movement\
  another. Unlocked by Abyssal Engineering; a cuttable strategic network.\
 ")
 
+[extra_kelp_farm]
+name           = _("Kelp Farm")
+category       = "Infra"
+causes         = "Base"
+rmcauses       = "Pillage"
+graphic        = "tx.farmland"
+graphic_alt    = "tx.irrigation"
+graphic_alt2   = "-"
+activity_gfx   = "unit.irrigation"
+act_gfx_alt    = "-"
+act_gfx_alt2   = "-"
+rmact_gfx      = "None"
+rmact_gfx_alt  = "-"
+rmact_gfx_alt2 = "-"
+reqs           =
+    { "type",         "name",             "range",  "present"
+      "Tech",         "Pressure Ecology", "Player", TRUE
+      "TerrainClass", "Oceanic",          "Tile",   TRUE
+      "UnitTypeFlag", "Workers",          "Local",  TRUE
+      "CityTile",     "Center",           "Tile",   FALSE
+    }
+build_time     = 3
+removal_time   = 0
+helptext       = _("\
+Cultivated kelp beds and shellfish racks on the continental shelf. A Kelp Farm \
+adds food and trade to the ocean tile it sits on, stacking on top of the \
+Harbor/Aquaculture building bonuses so an undersea worker can turn a chosen \
+shelf tile into a breadbasket. Built by Undersea Workers; requires Pressure \
+Ecology.\
+")
+
 [extra_ruins]
 name           = _("Ruins")
 category       = "Bonus"
@@ -2276,6 +2307,11 @@ border_sq      = -1
 extra          = "Buoy"
 gui_type       = "Fortress"
 vision_main_sq = 5
+
+[base_kelp_farm]
+extra          = "Kelp Farm"
+gui_type       = "Other"
+border_sq      = -1
 
 ; /* <-- avoid gettext warnings
 ;
