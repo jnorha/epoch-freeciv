@@ -8,7 +8,7 @@ name: deploy to droplet
 # fetch the target ref, hard-checkout, rebuild, restart, health-check.
 #
 # ── One-time setup (repo Settings → Secrets and variables → Actions) ─────────
-#   DO_HOST     droplet IP or hostname            (e.g. 178.128.231.84)
+#   DO_HOST     droplet IP or hostname            (e.g. <DROPLET_IP>)
 #   DO_USER     ssh user with docker access       (e.g. root, or a deploy user)
 #   DO_SSH_KEY  PRIVATE key (full PEM/OpenSSH) whose PUBLIC half is in that
 #               user's ~/.ssh/authorized_keys on the droplet. Generate a

@@ -3,8 +3,8 @@
 # harden-droplet.sh — one-shot SSH + host hardening for palatine-ov2 (Ubuntu 24.04)
 #
 # Run this ON THE DROPLET as root (or via sudo), e.g.:
-#     scp ops/droplet/harden-droplet.sh root@178.128.231.84:/root/
-#     ssh root@178.128.231.84 'bash /root/harden-droplet.sh'
+#     scp ops/droplet/harden-droplet.sh root@<DROPLET_IP>:/root/
+#     ssh root@<DROPLET_IP> 'bash /root/harden-droplet.sh'
 #
 # It is idempotent — safe to re-run. It does NOT touch Docker or the game
 # container. It hardens the HOST: SSH daemon, fail2ban, ufw, auto security
@@ -17,13 +17,13 @@
 #     control for those is the **DigitalOcean Cloud Firewall** (edge, applied
 #     before traffic reaches the droplet). See ops/droplet/README.md — you MUST
 #     set that up too; this script alone does not close the game/debug ports.
-#   * The password gate for the game is Caddy (ops/droplet/Caddyfile), not this.
+#   * The password gate for the game is Caddy (ops/droplet/Caddyfile.example), not this.
 #
 # ── SSH access note ──────────────────────────────────────────────────────────
 #   This DISABLES SSH password authentication (key-only). Before it does, it
 #   verifies at least one authorized_key exists for the current user and root,
 #   and ABORTS if not (so you can't lock yourself out). Make sure your key works
-#   BEFORE running: `ssh root@178.128.231.84` should already succeed with no
+#   BEFORE running: `ssh root@<DROPLET_IP>` should already succeed with no
 #   password prompt.
 # ─────────────────────────────────────────────────────────────────────────────
 set -euo pipefail

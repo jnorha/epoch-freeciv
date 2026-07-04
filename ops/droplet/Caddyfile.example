@@ -6,7 +6,7 @@
 # and forwards everything — including the game WebSocket — to the freeciv-web
 # container's nginx on 127.0.0.1:8080.
 #
-# Friends then visit  http://178.128.231.84/  , enter the shared password, and
+# Friends then visit  http://<DROPLET_IP>/  , enter the shared password, and
 # play. The container's :8080 (and all other Docker ports) stay OFF the public
 # internet via the DigitalOcean Cloud Firewall — Caddy on :80/:443 is the only
 # public door, and it's locked.

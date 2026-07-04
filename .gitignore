@@ -87,6 +87,15 @@ tests/screenshot*.png
 ops/observability/grafana/data/
 ops/observability/data/
 
+# Epoch — droplet: templates are tracked (*.example), but never commit the
+# filled-in Caddyfile (holds the game password hash), the droplet's real IP/host,
+# or any droplet-local secrets/notes. Keep operational specifics out of the
+# public repo.
+ops/droplet/Caddyfile
+ops/droplet/*.secret
+ops/droplet/*.local
+ops/droplet/*.env
+
 # Epoch — art pipeline intermediates
 tools/art/output/
 tools/art/*.tmp

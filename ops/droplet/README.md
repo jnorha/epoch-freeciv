@@ -1,4 +1,4 @@
-# Droplet lockdown runbook — palatine-ov2 (178.128.231.84)
+# Droplet lockdown runbook — palatine-ov2 (<DROPLET_IP>)
 
 Goal: let the friend group play over the WAN **without leaving an open,
 unauthenticated public server**. The design:
@@ -26,7 +26,7 @@ Two independent controls, both required:
 | Control | What it does | Where |
 |---|---|---|
 | **DO Cloud Firewall** | Closes every port except 22/80/443 at the network edge. **This is the authoritative port lock** — `ufw` cannot block Docker-published ports (8080, 4002, 6000-7009, 8888), Docker's iptables bypass it. | DO dashboard |
-| **Caddy + basic_auth** | Puts a shared-password prompt in front of the game. The only public HTTP door (80/443) is locked. | `Caddyfile` |
+| **Caddy + basic_auth** | Puts a shared-password prompt in front of the game. The only public HTTP door (80/443) is locked. | `Caddyfile.example` |
 | SSH hardening | Key-only auth, no password login, fail2ban, auto security updates. Defense-in-depth for admin access. | `harden-droplet.sh` |
 
 ---
@@ -37,15 +37,15 @@ Two independent controls, both required:
 > breaks SSH, you fix it from the other session instead of getting locked out.
 
 ### 1. Confirm key auth works FIRST
-From your machine: `ssh root@178.128.231.84` must log in with **no password
-prompt**. If it asks for a password, run `ssh-copy-id root@178.128.231.84`
+From your machine: `ssh root@<DROPLET_IP>` must log in with **no password
+prompt**. If it asks for a password, run `ssh-copy-id root@<DROPLET_IP>`
 before going further. The hardening script aborts if it finds no authorized key,
 but confirm anyway.
 
 ### 2. SSH + host hardening
 ```bash
-scp ops/droplet/harden-droplet.sh root@178.128.231.84:/root/
-ssh root@178.128.231.84 'bash /root/harden-droplet.sh'
+scp ops/droplet/harden-droplet.sh root@<DROPLET_IP>:/root/
+ssh root@<DROPLET_IP> 'bash /root/harden-droplet.sh'
 ```
 Then, from a **second** terminal, verify you can still open a fresh SSH session.
 Only once that works should you trust the change.
@@ -53,12 +53,14 @@ Only once that works should you trust the change.
 ### 3. Caddy password gate
 On the droplet:
 ```bash
-# install caddy (see the header of ops/droplet/Caddyfile for the apt commands)
+# install caddy (see the header of ops/droplet/Caddyfile.example for the apt commands)
 caddy hash-password --plaintext 'PICK-A-SHARED-PASSWORD'      # copy the $2a$... hash
 ```
-Edit `ops/droplet/Caddyfile`: replace `REPLACE_ME_HASH` with that hash. Then:
+Copy the template and fill it in (the filled-in `Caddyfile` is gitignored so the
+password hash never lands in the repo):
 ```bash
-sudo cp Caddyfile /etc/caddy/Caddyfile
+cp ops/droplet/Caddyfile.example ops/droplet/Caddyfile   # then edit: replace REPLACE_ME_HASH
+sudo cp ops/droplet/Caddyfile /etc/caddy/Caddyfile
 sudo mkdir -p /var/log/caddy
 sudo systemctl enable --now caddy
 sudo systemctl reload caddy
@@ -82,9 +84,9 @@ closes them to the public — players reach the game only through Caddy on 80/44
 Outbound: leave the default allow-all.
 
 ### 5. Verify end to end
-- From outside: `http://178.128.231.84:8080/` should now **fail/time out**
+- From outside: `http://<DROPLET_IP>:8080/` should now **fail/time out**
   (good — the direct game port is closed at the edge).
-- `http://178.128.231.84/` should prompt for the password, then load the client.
+- `http://<DROPLET_IP>/` should prompt for the password, then load the client.
 - **Play-test the WebSocket with ONE friend before a real session** (see caveat).
 
 ---
@@ -116,7 +118,7 @@ Web play rides a WebSocket that the container's nginx proxies internally, so a
 same-origin connection through Caddy *should* just work (`reverse_proxy` upgrades
 WS automatically). But the freeciv-web client can be finicky about how it builds
 the socket URL. **Before you gather everyone**, have one friend connect through
-`http://178.128.231.84/`, enter the password, and actually start/join a game to
+`http://<DROPLET_IP>/`, enter the password, and actually start/join a game to
 confirm the socket connects — not just that the page loads. If it fails to
 connect, the fix is small (adjust the client's socket origin or add an explicit
 `/civsocket` proxy path in the Caddyfile) — flag it and we'll sort it. Don't
