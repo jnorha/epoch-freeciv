@@ -80,6 +80,35 @@ Lattices) so content lands against stable tech ids.
    ocean-city viability knob).
 4. All undersea extras are gated so no pre-Helix civ can build them.
 
+### 5a. Sea Tunnel shipped + S3 CLOSED (✅ 2026-07-03, develop)
+Shipped the Sea Tunnel (the one piece without a shipped precedent). Two paired sections are
+required for any `causes="Road"` extra:
+- `[extra_sea_tunnel]` — `causes="Road"`, `reqs { Tech "Abyssal Engineering"; TerrainClass
+  "Oceanic" }`, `native_to = "Sea", "Trireme", "Orbital"`, `flags="NativeTile"`, `build_time=4`.
+- `[road_sea_tunnel]` — `extra="Sea Tunnel"`, **`move_cost=1`** (the fast-corridor benefit),
+  `gui_type="Other"`.
+
+> **⚠️ Gotcha (cost one debug cycle):** a `causes="Road"` extra with **no matching `[road_*]`
+> section segfaults the server at ruleset load** (the parser prints
+> *`extra "Sea Tunnel" has "Road" cause but no corresponding [road_*] section`* then crashes with
+> SIGSEGV rather than exiting cleanly). Every road-cause extra needs its `[road_<tag>]` twin. Same
+> pattern applies to `causes="Base"` → `[base_*]` and `causes="Mine"` (no section needed, `Mine`
+> is a built-in cause). Fix was one-shot once the error line was read.
+
+**S3 spike — PASS (empirically closes the last precedent-only spike).** `tile:create_extra("Sea
+Tunnel")` on a **shallow Ocean** tile: `has_extra` false→true; `remove_extra` round-trips back to
+false; and it also places on **Deep Ocean**. Zero Lua/engine errors. So a Road-cause extra is fully
+valid + placeable on ocean terrain — the only ocean-specific uncertainty. The `move_cost=1` benefit
+is **engine-standard, terrain-agnostic** road behavior (applied to native-class units on the tile
+regardless of underlying terrain), so no further ocean-specific risk remains; a live move-cost
+measurement is deferred to a play test. Real building is gated by the extra `reqs` (Abyssal
+Engineering + Oceanic) to an ocean-capable `Workers`-flag unit (undersea worker — see §2, TODO).
+
+**Deferred (rest of 2.2):** Undersea Mine (Oil Platform re-gate, needs an Offshore-Platform-style
+building effect for the shield yield), **Bio-Farm** (+food — the piece that lets 2.1's undersea
+cities actually grow; needs an `Output_Inc_Tile` effect in `effects.ruleset`), Buoy re-use, the
+solarpunk arrays, and the ocean-native undersea worker unit that builds all of them.
+
 ## 6. Open questions
 - **Sea Tunnel movement semantics:** does `causes="Road"` on ocean grant the road move bonus, or
   only visually connect? (S3 answers.) If only visual, use a movement effect.

@@ -1742,6 +1742,34 @@ Buoys may be built in the ocean by Transports (or by worker units on a \
 sea-going vessel) to allow their owner to see the surrounding tiles.\
 ")
 
+[extra_sea_tunnel]
+name           = _("Sea Tunnel")
+category       = "Infra"
+causes         = "Road"
+rmcauses       = "Pillage"
+graphic        = "road.road"
+graphic_alt    = "-"
+activity_gfx   = "unit.road"
+act_gfx_alt    = "-"
+act_gfx_alt2   = "-"
+rmact_gfx      = "None"
+rmact_gfx_alt  = "-"
+rmact_gfx_alt2 = "-"
+reqs           =
+    { "type",         "name",                "range",  "present"
+      "Tech",         "Abyssal Engineering", "Player", TRUE
+      "TerrainClass", "Oceanic",             "Tile",   TRUE
+    }
+build_time     = 4
+removal_time   = 0
+native_to      = "Sea", "Trireme", "Orbital"
+flags          = "NativeTile"
+helptext       = _("\
+A pressurized seafloor corridor. Sea Tunnels speed undersea and naval movement\
+ across the ocean floor, knitting undersea cities to the coast and to one\
+ another. Unlocked by Abyssal Engineering; a cuttable strategic network.\
+")
+
 [extra_ruins]
 name           = _("Ruins")
 category       = "Bonus"
@@ -2348,4 +2376,15 @@ move_mode      = "Cardinal"
 trade_incr_const = 1
 compat_special = "River"
 flags          = "River"
+gui_type       = "Other"
+
+[road_sea_tunnel]
+extra          = "Sea Tunnel"
+move_cost      = 1
+food_incr      = 0
+shield_incr    = 0
+trade_incr     = 0
+food_bonus     = 0
+shield_bonus   = 0
+trade_bonus    = 0
 gui_type       = "Other"
