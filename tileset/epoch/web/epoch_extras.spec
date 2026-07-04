@@ -33,4 +33,7 @@ tiles = { "row", "column", "tag"
   1, 2, "road.sea_tunnel_sw"
   1, 3, "road.sea_tunnel_nw"
   1, 4, "road.sea_tunnel_isolated"
+  2, 0, "extra.solar_array"
+  2, 1, "extra.vertical_farm"
+  2, 2, "extra.rewilding_grove"
 }

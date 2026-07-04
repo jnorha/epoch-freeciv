@@ -13,6 +13,9 @@
     { "tag": "road.sea_tunnel_se", "file": "../../../tileset/epoch/src/extras/sea_tunnel_se.png" },
     { "tag": "road.sea_tunnel_sw", "file": "../../../tileset/epoch/src/extras/sea_tunnel_sw.png" },
     { "tag": "road.sea_tunnel_nw", "file": "../../../tileset/epoch/src/extras/sea_tunnel_nw.png" },
-    { "tag": "road.sea_tunnel_isolated", "file": "../../../tileset/epoch/src/extras/sea_tunnel_isolated.png" }
+    { "tag": "road.sea_tunnel_isolated", "file": "../../../tileset/epoch/src/extras/sea_tunnel_isolated.png" },
+    { "tag": "extra.solar_array", "file": "../../../tileset/epoch/src/extras/solar_array_96x48.png" },
+    { "tag": "extra.vertical_farm", "file": "../../../tileset/epoch/src/extras/vertical_farm_96x48.png" },
+    { "tag": "extra.rewilding_grove", "file": "../../../tileset/epoch/src/extras/rewilding_grove_96x48.png" }
   ]
 }

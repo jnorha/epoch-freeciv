@@ -1801,6 +1801,100 @@ shelf tile into a breadbasket. Built by Undersea Workers; requires Pressure \
 Ecology.\
 ")
 
+; --------------------------------------------------------------------------
+; Solarpunk land improvements (Epoch): worker-built tile overlays that give
+; the developed land a solarpunk character AND per-tile yields. Same proven
+; "Base"-cause path as the Kelp Farm (Build Base has empty actor-reqs; land
+; terrain has CanBase) + a paired [base_*] twin each.
+; --------------------------------------------------------------------------
+[extra_solar_array]
+name           = _("Solar Array")
+category       = "Infra"
+causes         = "Base"
+rmcauses       = "Pillage"
+graphic        = "extra.solar_array"
+graphic_alt    = "tx.mine"
+graphic_alt2   = "-"
+activity_gfx   = "unit.mine"
+act_gfx_alt    = "-"
+act_gfx_alt2   = "-"
+rmact_gfx      = "None"
+rmact_gfx_alt  = "-"
+rmact_gfx_alt2 = "-"
+reqs           =
+    { "type",         "name",            "range",  "present"
+      "Tech",         "Environmentalism", "Player", TRUE
+      "TerrainClass", "Land",             "Tile",   TRUE
+      "UnitTypeFlag", "Workers",          "Local",  TRUE
+      "CityTile",     "Center",           "Tile",   FALSE
+    }
+build_time     = 3
+removal_time   = 0
+helptext       = _("\
+Photovoltaic canopies and thin-film sails woven over the land. A Solar Array \
+draws clean power from the healed sky, adding production to the tile it sits \
+on. Built by Workers; requires Environmentalism.\
+")
+
+[extra_vertical_farm]
+name           = _("Vertical Farm")
+category       = "Infra"
+causes         = "Base"
+rmcauses       = "Pillage"
+graphic        = "extra.vertical_farm"
+graphic_alt    = "tx.farmland"
+graphic_alt2   = "-"
+activity_gfx   = "unit.irrigation"
+act_gfx_alt    = "-"
+act_gfx_alt2   = "-"
+rmact_gfx      = "None"
+rmact_gfx_alt  = "-"
+rmact_gfx_alt2 = "-"
+reqs           =
+    { "type",         "name",               "range",  "present"
+      "Tech",         "Genetic Engineering", "Player", TRUE
+      "TerrainClass", "Land",                "Tile",   TRUE
+      "UnitTypeFlag", "Workers",             "Local",  TRUE
+      "CityTile",     "Center",              "Tile",   FALSE
+    }
+build_time     = 3
+removal_time   = 0
+helptext       = _("\
+Stacked hydroponic towers glinting with grow-light green. A Vertical Farm \
+multiplies the food a single tile yields, feeding dense solarpunk cities. \
+Built by Workers; requires Genetic Engineering.\
+")
+
+[extra_rewilding_grove]
+name           = _("Rewilding Grove")
+category       = "Infra"
+causes         = "Base"
+rmcauses       = "Pillage"
+graphic        = "extra.rewilding_grove"
+graphic_alt    = "tx.forest"
+graphic_alt2   = "-"
+activity_gfx   = "unit.irrigation"
+act_gfx_alt    = "-"
+act_gfx_alt2   = "-"
+rmact_gfx      = "None"
+rmact_gfx_alt  = "-"
+rmact_gfx_alt2 = "-"
+reqs           =
+    { "type",         "name",              "range",  "present"
+      "Tech",         "Closed Biospheres", "Player", TRUE
+      "TerrainClass", "Land",              "Tile",   TRUE
+      "UnitTypeFlag", "Workers",           "Local",  TRUE
+      "CityTile",     "Center",            "Tile",   FALSE
+    }
+build_time     = 3
+removal_time   = 0
+helptext       = _("\
+A cultivated pocket of restored wild -- pollinator meadows, mixed canopy, \
+paths for eco-tourism and study. A Rewilding Grove turns biodiversity into \
+commerce, adding trade to the tile. Built by Workers; requires Closed \
+Biospheres.\
+")
+
 [extra_ruins]
 name           = _("Ruins")
 category       = "Bonus"
@@ -2338,6 +2432,21 @@ vision_main_sq = 5
 
 [base_kelp_farm]
 extra          = "Kelp Farm"
+gui_type       = "Other"
+border_sq      = -1
+
+[base_solar_array]
+extra          = "Solar Array"
+gui_type       = "Other"
+border_sq      = -1
+
+[base_vertical_farm]
+extra          = "Vertical Farm"
+gui_type       = "Other"
+border_sq      = -1
+
+[base_rewilding_grove]
+extra          = "Rewilding Grove"
 gui_type       = "Other"
 border_sq      = -1
 

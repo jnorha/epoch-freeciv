@@ -2273,6 +2273,35 @@ reqs    =
       "OutputType", "Trade", "Local", TRUE
     }
 
+; Solarpunk land improvements — per-tile yields (worker-built overlays).
+; Solar Array => production, Vertical Farm => food, Rewilding Grove => trade.
+[effect_solar_array_shield]
+type    = "Output_Inc_Tile"
+value   = 2
+reqs    =
+    { "type", "name", "range", "present"
+      "Extra", "Solar Array", "Tile", TRUE
+      "OutputType", "Shield", "Local", TRUE
+    }
+
+[effect_vertical_farm_food]
+type    = "Output_Inc_Tile"
+value   = 2
+reqs    =
+    { "type", "name", "range", "present"
+      "Extra", "Vertical Farm", "Tile", TRUE
+      "OutputType", "Food", "Local", TRUE
+    }
+
+[effect_rewilding_grove_trade]
+type    = "Output_Inc_Tile"
+value   = 2
+reqs    =
+    { "type", "name", "range", "present"
+      "Extra", "Rewilding Grove", "Tile", TRUE
+      "OutputType", "Trade", "Local", TRUE
+    }
+
 ; ---------------------------------------------------------------------------
 ; Epoch 3.1 — Diamond-age Great Wonder effects (Lattice capstones)
 ; ---------------------------------------------------------------------------
