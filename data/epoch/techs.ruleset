@@ -41,6 +41,55 @@ format_version = 40
 ;
 ; */ <-- avoid gettext warnings
 
+; ==========================================================================
+; Epoch Slice 4 — era-pacing tech classes. One class per age; its cost_pct is
+; THE per-era pacing knob (Linear tech_cost_style = base_tech_cost * reqs *
+; cost_pct/100, so this multiplies each tech's depth-derived cost).
+;
+; PACING PHILOSOPHY — "accelerating future grind" (revised 2026-07-04):
+; NOT flat era shares. The time to cross each successive age rises on a curve,
+; so the far-future is a deliberate long-game investment that CANNOT be rushed
+; to dominate — a player who beelines the tree still grinds through steeply
+; priced Helix/Lattice techs (and pays for every recursive prereq under Linear
+; + the root_req anchors). The multiplier curve is convex and concentrated in
+; the two future ages:
+;   Ember  100  — normal 4X establishment
+;   Compass 115 — slight rise
+;   Dynamo  70  — DISCOUNTED on purpose: its 45-tech breadth already makes it
+;                 the longest HISTORICAL age by COUNT; a high multiplier on top
+;                 would bloat the mid-game instead of the future.
+;   Helix   250 — ~3.5x jump: the "true future" difficulty spike begins
+;   Lattice 600 — ~2.4x again: the endgame grind (14 deep techs, each very dear
+;                 — completing the Lattice tree is a whole-game-length slog so
+;                 nobody rushes the dominant far-future techs)
+; So per-tech cost jumps sharply at the Helix boundary and again at Lattice,
+; while Dynamo's length stays count-driven. Retune from the age-duration curve
+; that scripts/epoch-era-autogame.sh prints (want I->II < II->III < III->IV <
+; IV->V, each increment larger than the last). Mirrors EPOCH_CONFIG.era_cost_pct
+; in script.lua (keep in sync); the single documented tuning surface (roadmap
+; doctrine §2). FIRST class is the default for any untagged advance — kept as
+; Ember so a stray tech reads as age I, not an error.
+; ==========================================================================
+[techclass_ember]
+name = _("Ember")
+cost_pct = 100
+
+[techclass_compass]
+name = _("Compass")
+cost_pct = 115
+
+[techclass_dynamo]
+name = _("Dynamo")
+cost_pct = 70
+
+[techclass_helix]
+name = _("Helix")
+cost_pct = 250
+
+[techclass_lattice]
+name = _("Lattice")
+cost_pct = 600
+
 ;[techclass_default]
 ;name =
 
@@ -112,6 +161,7 @@ format_version = 40
 
 [advance_advanced_flight]
 name     = _("Advanced Flight")
+class    = "Dynamo"
 req1     = "Radio"
 req2     = "Machine Tools"
 flags    = ""
@@ -121,6 +171,7 @@ helptext = _("Enables movement of nuclear units.")
 
 [advance_alphabet]
 name     = _("Alphabet")
+class    = "Ember"
 req1     = "None"
 req2     = "None"
 flags    = ""
@@ -129,6 +180,7 @@ graphic_alt = "-"
 
 [advance_amphibious_warfare]
 name     = _("Amphibious Warfare")
+class    = "Dynamo"
 req1     = "Engineering"
 req2     = "Tactics"
 flags    = ""
@@ -137,6 +189,7 @@ graphic_alt = "-"
 
 [advance_astronomy]
 name     = _("Astronomy")
+class    = "Ember"
 req1     = "Mysticism"
 req2     = "Mathematics"
 flags    = ""
@@ -146,6 +199,7 @@ helptext = _("Increases units' vision when in fortresses.")
 
 [advance_atomic_theory]
 name     = _("Atomic Theory")
+class    = "Dynamo"
 req1     = "Chemistry"
 req2     = "Refrigeration"
 flags    = ""
@@ -154,6 +208,7 @@ graphic_alt = "-"
 
 [advance_automobile]
 name     = _("Automobile")
+class    = "Dynamo"
 req1     = "Combustion"
 req2     = "Steel"
 flags    = ""
@@ -162,6 +217,7 @@ graphic_alt = "-"
 
 [advance_banking]
 name     = _("Banking")
+class    = "Compass"
 req1     = "Trade"
 req2     = "The Republic"
 flags    = ""
@@ -170,6 +226,7 @@ graphic_alt = "-"
 
 [advance_bridge_building]
 name     = _("Bridge Building")
+class    = "Ember"
 req1     = "The Wheel"
 req2     = "Construction"
 flags    = "Bridge"
@@ -179,6 +236,7 @@ helptext = _("Allows roads to be built on river tiles.")
 
 [advance_bronze_working]
 name     = _("Bronze Working")
+class    = "Ember"
 req1     = "None"
 req2     = "None"
 flags    = ""
@@ -187,6 +245,7 @@ graphic_alt = "-"
 
 [advance_ceremonial_burial]
 name     = _("Ceremonial Burial")
+class    = "Ember"
 req1     = "None"
 req2     = "None"
 flags    = ""
@@ -195,6 +254,7 @@ graphic_alt = "-"
 
 [advance_chemistry]
 name     = _("Chemistry")
+class    = "Compass"
 req1     = "University"
 req2     = "Medicine"
 flags    = ""
@@ -203,6 +263,7 @@ graphic_alt = "-"
 
 [advance_chivalry]
 name     = _("Chivalry")
+class    = "Compass"
 req1     = "Feudalism"
 req2     = "Horseback Riding"
 flags    = ""
@@ -211,6 +272,7 @@ graphic_alt = "-"
 
 [advance_code_of_laws]
 name     = _("Code of Laws")
+class    = "Ember"
 req1     = "Alphabet"
 req2     = "None"
 flags    = ""
@@ -219,6 +281,7 @@ graphic_alt = "-"
 
 [advance_combined_arms]
 name     = _("Combined Arms")
+class    = "Dynamo"
 req1     = "Mobile Warfare"
 req2     = "Advanced Flight"
 flags    = ""
@@ -227,6 +290,7 @@ graphic_alt = "-"
 
 [advance_combustion]
 name     = _("Combustion")
+class    = "Dynamo"
 req1     = "Refining"
 req2     = "Engineering"
 flags    = ""
@@ -235,6 +299,7 @@ graphic_alt = "-"
 
 [advance_communism]
 name     = _("Communism")
+class    = "Dynamo"
 req1     = "Theology"
 req2     = "Industrialization"
 flags    = ""
@@ -243,6 +308,7 @@ graphic_alt = "-"
 
 [advance_computers]
 name     = _("Computers")
+class    = "Dynamo"
 req1     = "Miniaturization"
 req2     = "Radio"
 flags    = ""
@@ -251,6 +317,7 @@ graphic_alt = "-"
 
 [advance_conscription]
 name     = _("Conscription")
+class    = "Dynamo"
 req1     = "Democracy"
 req2     = "Metallurgy"
 flags    = ""
@@ -259,6 +326,7 @@ graphic_alt = "-"
 
 [advance_construction]
 name     = _("Construction")
+class    = "Ember"
 req1     = "Masonry"
 req2     = "Iron Working"
 flags    = ""
@@ -271,6 +339,7 @@ units to build forts and fortresses.\
 
 [advance_currency]
 name     = _("Currency")
+class    = "Ember"
 req1     = "Bronze Working"
 req2     = "None"
 flags    = ""
@@ -279,6 +348,7 @@ graphic_alt = "-"
 
 [advance_democracy]
 name     = _("Democracy")
+class    = "Compass"
 req1     = "Banking"
 req2     = "Invention"
 flags    = ""
@@ -287,6 +357,7 @@ graphic_alt = "-"
 
 [advance_economics]
 name     = _("Economics")
+class    = "Compass"
 req1     = "Banking"
 req2     = "University"
 flags    = ""
@@ -295,6 +366,7 @@ graphic_alt = "-"
 
 [advance_electricity]
 name     = _("Electricity")
+class    = "Dynamo"
 req1     = "Metallurgy"
 req2     = "Theory of Gravity"
 flags    = ""
@@ -307,6 +379,7 @@ effect of Amphitheaters, and increases city vision radius.\
 
 [advance_electronics]
 name     = _("Electronics")
+class    = "Dynamo"
 req1     = "The Corporation"
 req2     = "Electricity"
 flags    = ""
@@ -315,6 +388,7 @@ graphic_alt = "-"
 
 [advance_engineering]
 name     = _("Engineering")
+class    = "Dynamo"
 req1     = "Electricity"
 req2     = "Steam Engine"
 flags    = ""
@@ -323,6 +397,7 @@ graphic_alt = "-"
 
 [advance_environmentalism]
 name     = _("Environmentalism")
+class    = "Dynamo"
 req1     = "Recycling"
 req2     = "Space Flight"
 flags    = ""
@@ -331,6 +406,7 @@ graphic_alt = "-"
 
 [advance_espionage]
 name     = _("Espionage")
+class    = "Dynamo"
 req1     = "Communism"
 req2     = "Democracy"
 flags    = ""
@@ -339,6 +415,7 @@ graphic_alt = "-"
 
 [advance_explosives]
 name     = _("Explosives")
+class    = "Dynamo"
 req1     = "Gunpowder"
 req2     = "Chemistry"
 flags    = ""
@@ -347,6 +424,7 @@ graphic_alt = "-"
 
 [advance_feudalism]
 name     = _("Feudalism")
+class    = "Compass"
 req1     = "Iron Working"
 req2     = "Monarchy"
 flags    = ""
@@ -355,6 +433,7 @@ graphic_alt = "-"
 
 [advance_flight]
 name     = _("Flight")
+class    = "Dynamo"
 req1     = "Combustion"
 req2     = "Tactics"
 flags    = "Build_Airborne"
@@ -363,6 +442,7 @@ graphic_alt = "-"
 
 [advance_fusion_power]
 name     = _("Fusion Power")
+class    = "Dynamo"
 req1     = "Superconductors"
 req2     = "Labor Union"
 flags    = ""
@@ -372,6 +452,7 @@ helptext = _("Makes it possible for Engineers to transform terrains.")
 
 [advance_genetic_engineering]
 name     = _("Genetic Engineering")
+class    = "Dynamo"
 req1     = "Refrigeration"
 req2     = "The Corporation"
 flags    = ""
@@ -380,6 +461,7 @@ graphic_alt = "-"
 
 [advance_guerilla_warfare]
 name     = _("Guerilla Warfare")
+class    = "Dynamo"
 req1     = "Communism"
 req2     = "Tactics"
 flags    = ""
@@ -388,6 +470,7 @@ graphic_alt = "-"
 
 [advance_gunpowder]
 name     = _("Gunpowder")
+class    = "Compass"
 req1     = "Invention"
 req2     = "Feudalism"
 graphic     = "a.gunpowder"
@@ -395,6 +478,7 @@ graphic_alt = "-"
 
 [advance_horseback_riding]
 name     = _("Horseback Riding")
+class    = "Ember"
 req1     = "None"
 req2     = "None"
 flags    = ""
@@ -403,6 +487,7 @@ graphic_alt = "-"
 
 [advance_industrialization]
 name     = _("Industrialization")
+class    = "Dynamo"
 req1     = "Railroad"
 req2     = "Banking"
 graphic     = "a.industrialization"
@@ -410,6 +495,7 @@ graphic_alt = "-"
 
 [advance_invention]
 name     = _("Invention")
+class    = "Compass"
 req1     = "Bridge Building"
 req2     = "Literacy"
 flags    = ""
@@ -419,6 +505,7 @@ helptext = _("Halves the upgrade cost of your units.")
 
 [advance_iron_working]
 name     = _("Iron Working")
+class    = "Ember"
 req1     = "Bronze Working"
 req2     = "Warrior Code"
 flags    = ""
@@ -427,6 +514,7 @@ graphic_alt = "-"
 
 [advance_labor_union]
 name     = _("Labor Union")
+class    = "Dynamo"
 req1     = "Communism"
 req2     = "Mobile Warfare"
 flags    = ""
@@ -435,6 +523,7 @@ graphic_alt = "-"
 
 [advance_laser]
 name     = _("Laser")
+class    = "Dynamo"
 req1     = "Computers"
 req2     = "Nuclear Power"
 flags    = ""
@@ -443,6 +532,7 @@ graphic_alt = "-"
 
 [advance_leadership]
 name     = _("Leadership")
+class    = "Compass"
 req1     = "Chivalry"
 req2     = "Gunpowder"
 flags    = ""
@@ -451,6 +541,7 @@ graphic_alt = "-"
 
 [advance_literacy]
 name     = _("Literacy")
+class    = "Ember"
 req1     = "Writing"
 req2     = "Code of Laws"
 flags    = ""
@@ -459,6 +550,7 @@ graphic_alt = "-"
 
 [advance_machine_tools]
 name     = _("Machine Tools")
+class    = "Dynamo"
 req1     = "Steel"
 req2     = "Tactics"
 flags    = ""
@@ -467,6 +559,7 @@ graphic_alt = "-"
 
 [advance_magnetism]
 name     = _("Magnetism")
+class    = "Compass"
 req1     = "Seafaring"
 req2     = "Astronomy"
 flags    = ""
@@ -475,6 +568,7 @@ graphic_alt = "-"
 
 [advance_map_making]
 name     = _("Map Making")
+class    = "Ember"
 req1     = "Alphabet"
 req2     = "None"
 flags    = ""
@@ -483,6 +577,7 @@ graphic_alt = "-"
 
 [advance_masonry]
 name     = _("Masonry")
+class    = "Ember"
 req1     = "None"
 req2     = "None"
 flags    = ""
@@ -491,6 +586,7 @@ graphic_alt = "-"
 
 [advance_mass_production]
 name     = _("Mass Production")
+class    = "Dynamo"
 req1     = "Automobile"
 req2     = "The Corporation"
 flags    = ""
@@ -499,6 +595,7 @@ graphic_alt = "-"
 
 [advance_mathematics]
 name     = _("Mathematics")
+class    = "Ember"
 req1     = "Alphabet"
 req2     = "Masonry"
 flags    = ""
@@ -507,6 +604,7 @@ graphic_alt = "-"
 
 [advance_medicine]
 name     = _("Medicine")
+class    = "Ember"
 req1     = "Philosophy"
 req2     = "Trade"
 flags    = ""
@@ -520,6 +618,7 @@ Reduces the risk of plague in your cities by 30% of the base chance \
 
 [advance_metallurgy]
 name     = _("Metallurgy")
+class    = "Compass"
 req1     = "Gunpowder"
 req2     = "Mathematics"
 flags    = ""
@@ -528,6 +627,7 @@ graphic_alt = "-"
 
 [advance_miniaturization]
 name     = _("Miniaturization")
+class    = "Dynamo"
 req1     = "Combustion"
 req2     = "Electronics"
 flags    = ""
@@ -541,6 +641,7 @@ Offshore Platforms.\
 
 [advance_mobile_warfare]
 name     = _("Mobile Warfare")
+class    = "Dynamo"
 req1     = "Automobile"
 req2     = "Machine Tools"
 flags    = ""
@@ -549,6 +650,7 @@ graphic_alt = "-"
 
 [advance_monarchy]
 name     = _("Monarchy")
+class    = "Ember"
 req1     = "Ceremonial Burial"
 req2     = "Code of Laws"
 flags    = ""
@@ -557,6 +659,7 @@ graphic_alt = "-"
 
 [advance_monotheism]
 name     = _("Monotheism")
+class    = "Compass"
 req1     = "Astronomy"
 req2     = "Polytheism"
 flags    = ""
@@ -565,6 +668,7 @@ graphic_alt = "-"
 
 [advance_mysticism]
 name     = _("Mysticism")
+class    = "Ember"
 req1     = "Ceremonial Burial"
 req2     = "None"
 flags    = ""
@@ -574,6 +678,7 @@ helptext = _("Improves the effect of Temples.")
 
 [advance_navigation]
 name     = _("Navigation")
+class    = "Compass"
 req1     = "Invention"
 req2     = "Physics"
 flags    = ""
@@ -582,6 +687,7 @@ graphic_alt = "-"
 
 [advance_nuclear_fission]
 name     = _("Nuclear Fission")
+class    = "Dynamo"
 req1     = "Mass Production"
 req2     = "Atomic Theory"
 flags    = ""
@@ -590,6 +696,7 @@ graphic_alt = "-"
 
 [advance_nuclear_power]
 name     = _("Nuclear Power")
+class    = "Dynamo"
 req1     = "Nuclear Fission"
 req2     = "Miniaturization"
 flags    = ""
@@ -599,6 +706,7 @@ helptext = _("Gives sea units one extra move.")
 
 [advance_philosophy]
 name     = _("Philosophy")
+class    = "Ember"
 req1     = "Mysticism"
 req2     = "Literacy"
 flags    = "Bonus_Tech"
@@ -609,6 +717,7 @@ graphic_alt = "-"
 
 [advance_physics]
 name     = _("Physics")
+class    = "Compass"
 req1     = "The Wheel"
 req2     = "Magnetism"
 flags    = ""
@@ -617,6 +726,7 @@ graphic_alt = "-"
 
 [advance_plastics]
 name     = _("Plastics")
+class    = "Dynamo"
 req1     = "Mass Production"
 req2     = "Robotics"
 flags    = ""
@@ -625,6 +735,7 @@ graphic_alt = "-"
 
 [advance_polytheism]
 name     = _("Polytheism")
+class    = "Ember"
 req1     = "Horseback Riding"
 req2     = "Ceremonial Burial"
 flags    = ""
@@ -633,6 +744,7 @@ graphic_alt = "-"
 
 [advance_pottery]
 name     = _("Pottery")
+class    = "Ember"
 req1     = "None"
 req2     = "None"
 flags    = ""
@@ -641,6 +753,7 @@ graphic_alt = "-"
 
 [advance_radio]
 name     = _("Radio")
+class    = "Dynamo"
 req1     = "Flight"
 req2     = "Electronics"
 flags    = ""
@@ -653,6 +766,7 @@ airbases and buoys. Allows Transports to build buoys.\
 
 [advance_railroad]
 name     = _("?tech:Railroad")
+class    = "Dynamo"
 req1     = "Steam Engine"
 req2     = "Metallurgy"
 flags    = ""
@@ -669,6 +783,7 @@ celebrating).\
 
 [advance_recycling]
 name     = _("Recycling")
+class    = "Dynamo"
 req1     = "Mass Production"
 req2     = "Sanitation"
 flags    = ""
@@ -677,6 +792,7 @@ graphic_alt = "-"
 
 [advance_refining]
 name     = _("Refining")
+class    = "Dynamo"
 req1     = "Explosives"
 req2     = "Industrialization"
 flags    = ""
@@ -690,6 +806,7 @@ point.\
 
 [advance_refrigeration]
 name     = _("Refrigeration")
+class    = "Dynamo"
 req1     = "Sanitation"
 req2     = "Electricity"
 flags    = ""
@@ -702,6 +819,7 @@ irrigation systems to farmland.\
 
 [advance_robotics]
 name     = _("Robotics")
+class    = "Dynamo"
 req1     = "Mobile Warfare"
 req2     = "Computers"
 flags    = ""
@@ -710,6 +828,7 @@ graphic_alt = "-"
 
 [advance_rocketry]
 name     = _("Rocketry")
+class    = "Dynamo"
 req1     = "Advanced Flight"
 req2     = "Miniaturization"
 flags    = ""
@@ -719,6 +838,7 @@ helptext = _("Doubles movement of nuclear units.")
 
 [advance_sanitation]
 name     = _("Sanitation")
+class    = "Dynamo"
 req1     = "Bridge Building"
 req2     = "Medicine"
 flags    = ""
@@ -727,6 +847,7 @@ graphic_alt = "-"
 
 [advance_seafaring]
 name     = _("Seafaring")
+class    = "Ember"
 req1     = "Pottery"
 req2     = "Map Making"
 flags    = ""
@@ -735,6 +856,7 @@ graphic_alt = "-"
 
 [advance_space_flight]
 name     = _("Space Flight")
+class    = "Dynamo"
 req1     = "Computers"
 req2     = "Rocketry"
 flags    = ""
@@ -743,6 +865,7 @@ graphic_alt = "-"
 
 [advance_stealth]
 name     = _("Stealth")
+class    = "Dynamo"
 req1     = "Plastics"
 req2     = "Space Flight"
 flags    = ""
@@ -751,6 +874,7 @@ graphic_alt = "-"
 
 [advance_steam_engine]
 name     = _("Steam Engine")
+class    = "Dynamo"
 req1     = "Chemistry"
 req2     = "Navigation"
 flags    = ""
@@ -759,6 +883,7 @@ graphic_alt = "-"
 
 [advance_steel]
 name     = _("Steel")
+class    = "Dynamo"
 req1     = "Engineering"
 req2     = "Industrialization"
 flags    = ""
@@ -767,6 +892,7 @@ graphic_alt = "-"
 
 [advance_superconductors]
 name     = _("Superconductors")
+class    = "Dynamo"
 req1     = "Space Flight"
 req2     = "Laser"
 flags    = ""
@@ -779,6 +905,7 @@ with maglev.\
 
 [advance_tactics]
 name     = _("Tactics")
+class    = "Dynamo"
 req1     = "Conscription"
 req2     = "Leadership"
 flags    = ""
@@ -787,6 +914,7 @@ graphic_alt = "-"
 
 [advance_the_corporation]
 name     = _("The Corporation")
+class    = "Dynamo"
 req1     = "Economics"
 req2     = "Industrialization"
 flags    = ""
@@ -799,6 +927,7 @@ Halves the corruption of trade related to distance from the capital \
 
 [advance_the_republic]
 name     = _("The Republic")
+class    = "Ember"
 req1     = "Code of Laws"
 req2     = "Literacy"
 flags    = ""
@@ -807,6 +936,7 @@ graphic_alt = "-"
 
 [advance_the_wheel]
 name     = _("The Wheel")
+class    = "Ember"
 req1     = "Horseback Riding"
 req2     = "None"
 flags    = ""
@@ -815,6 +945,7 @@ graphic_alt = "-"
 
 [advance_theology]
 name     = _("Theology")
+class    = "Compass"
 req1     = "Philosophy"
 req2     = "Monotheism"
 flags    = ""
@@ -824,6 +955,7 @@ helptext = _("Improves the effect of Cathedrals.")
 
 [advance_theory_of_gravity]
 name     = _("Theory of Gravity")
+class    = "Compass"
 req1     = "Physics"
 req2     = "University"
 flags    = ""
@@ -832,6 +964,7 @@ graphic_alt = "-"
 
 [advance_trade]
 name     = _("Trade")
+class    = "Ember"
 req1     = "Currency"
 req2     = "Pottery"
 flags    = ""
@@ -843,6 +976,7 @@ Halves the waste of production related to distance from the capital.\
 
 [advance_university]
 name     = _("University")
+class    = "Compass"
 req1     = "Mathematics"
 req2     = "Philosophy"
 flags    = ""
@@ -851,6 +985,7 @@ graphic_alt = "-"
 
 [advance_warrior_code]
 name     = _("Warrior Code")
+class    = "Ember"
 req1     = "None"
 req2     = "None"
 flags    = ""
@@ -859,6 +994,7 @@ graphic_alt = "-"
 
 [advance_writing]
 name     = _("Writing")
+class    = "Ember"
 req1     = "Alphabet"
 req2     = "None"
 flags    = ""
@@ -878,6 +1014,7 @@ graphic_alt = "-"
 ; Dynamo (III) gap-fill — bridge into the future ages.
 [advance_networked_computing]
 name     = _("Networked Computing")
+class    = "Dynamo"
 req1     = "Computers"
 req2     = "Mass Production"
 flags    = ""
@@ -888,6 +1025,7 @@ graphic_alt = "-"
 ; it is the root_req carried by the rest of the Helix+Lattice subtree.
 [advance_genome_cartography]
 name     = _("Genome Cartography")
+class    = "Helix"
 req1     = "Genetic Engineering"
 req2     = "Networked Computing"
 flags    = ""
@@ -899,6 +1037,7 @@ graphic_alt = "-"
 ; once Genome Cartography is known. Seeds root_req inheritance into Lattice.
 [advance_cellular_rewriting]
 name     = _("Cellular Rewriting")
+class    = "Helix"
 req1     = "Genome Cartography"
 req2     = "Medicine"
 root_req = "Genome Cartography"
@@ -911,6 +1050,7 @@ graphic_alt = "-"
 ; Genome Cartography automatically — no age-V tech without age IV's anchor.
 [advance_molecular_assembly]
 name     = _("Molecular Assembly")
+class    = "Lattice"
 req1     = "Cultured Materials"
 req2     = "Synthetic Cognition"
 flags    = ""
@@ -923,6 +1063,7 @@ graphic_alt = "-"
 ; root_req = Genome Cartography. root_req here adds the age-V anchor gate too.
 [advance_metamaterials]
 name     = _("Metamaterials")
+class    = "Lattice"
 req1     = "Molecular Assembly"
 req2     = "Superconductors"
 root_req = "Molecular Assembly"
@@ -951,6 +1092,7 @@ graphic_alt = "-"
 ; -- Bio / agriculture / materials fork (direct children of the anchor) --
 [advance_chimeric_agriculture]
 name     = _("Chimeric Agriculture")
+class    = "Helix"
 req1     = "Genome Cartography"
 req2     = "Refrigeration"
 root_req = "Genome Cartography"
@@ -960,6 +1102,7 @@ graphic_alt = "-"
 
 [advance_cultured_materials]
 name     = _("Cultured Materials")
+class    = "Helix"
 req1     = "Genome Cartography"
 req2     = "Plastics"
 root_req = "Genome Cartography"
@@ -970,6 +1113,7 @@ graphic_alt = "-"
 ; -- Undersea line (inherits root_req via Cellular Rewriting) --
 [advance_pressure_ecology]
 name     = _("Pressure Ecology")
+class    = "Helix"
 req1     = "Cellular Rewriting"
 req2     = "Superconductors"
 flags    = ""
@@ -978,6 +1122,7 @@ graphic_alt = "-"
 
 [advance_abyssal_engineering]
 name     = _("Abyssal Engineering")
+class    = "Helix"
 req1     = "Pressure Ecology"
 req2     = "Steel"
 flags    = ""
@@ -987,6 +1132,7 @@ graphic_alt = "-"
 ; -- Cyborg line (inherits via Cellular Rewriting) --
 [advance_cybernetic_symbiosis]
 name     = _("Cybernetic Symbiosis")
+class    = "Helix"
 req1     = "Cellular Rewriting"
 req2     = "Robotics"
 flags    = ""
@@ -996,6 +1142,7 @@ graphic_alt = "-"
 ; -- Synthetic-mind line. Machine Cognition is a Dynamo-rooted ENTRY node -> explicit root_req. --
 [advance_machine_cognition]
 name     = _("Machine Cognition")
+class    = "Helix"
 req1     = "Networked Computing"
 req2     = "Robotics"
 root_req = "Genome Cartography"
@@ -1005,6 +1152,7 @@ graphic_alt = "-"
 
 [advance_synthetic_cognition]
 name     = _("Synthetic Cognition")
+class    = "Helix"
 req1     = "Machine Cognition"
 req2     = "Cellular Rewriting"
 flags    = ""
@@ -1014,6 +1162,7 @@ graphic_alt = "-"
 ; -- Solarpunk / ecology line (inherits via Chimeric Agriculture) --
 [advance_closed_biospheres]
 name     = _("Closed Biospheres")
+class    = "Helix"
 req1     = "Chimeric Agriculture"
 req2     = "Environmentalism"
 flags    = ""
@@ -1022,6 +1171,7 @@ graphic_alt = "-"
 
 [advance_reclamation_science]
 name     = _("Reclamation Science")
+class    = "Helix"
 req1     = "Closed Biospheres"
 req2     = "Recycling"
 flags    = ""
@@ -1031,6 +1181,7 @@ graphic_alt = "-"
 ; -- Energy-weapon line. Directed Energy is a Dynamo-rooted ENTRY node -> explicit root_req. --
 [advance_directed_energy]
 name     = _("Directed Energy")
+class    = "Helix"
 req1     = "Laser"
 req2     = "Fusion Power"
 root_req = "Genome Cartography"
@@ -1041,6 +1192,7 @@ graphic_alt = "-"
 ; -- Orbital line (inherits via Machine Cognition) --
 [advance_orbital_logistics]
 name     = _("Orbital Logistics")
+class    = "Helix"
 req1     = "Space Flight"
 req2     = "Machine Cognition"
 flags    = ""
@@ -1072,6 +1224,7 @@ graphic_alt = "-"
 ; -- Industry / materials fork off the anchor --
 [advance_adaptive_fabrication]
 name     = _("Adaptive Fabrication")
+class    = "Lattice"
 req1     = "Molecular Assembly"
 req2     = "Machine Cognition"
 root_req = "Molecular Assembly"
@@ -1081,6 +1234,7 @@ graphic_alt = "-"
 
 [advance_plasma_containment]
 name     = _("Plasma Containment")
+class    = "Lattice"
 req1     = "Directed Energy"
 req2     = "Metamaterials"
 flags    = ""
@@ -1089,6 +1243,7 @@ graphic_alt = "-"
 
 [advance_fusion_lattices]
 name     = _("Fusion Lattices")
+class    = "Lattice"
 req1     = "Fusion Power"
 req2     = "Metamaterials"
 flags    = ""
@@ -1098,6 +1253,7 @@ graphic_alt = "-"
 ; -- Orbital tier (Gap 3: weapon platforms) --
 [advance_skyhook_tethers]
 name     = _("Skyhook Tethers")
+class    = "Lattice"
 req1     = "Orbital Logistics"
 req2     = "Metamaterials"
 flags    = ""
@@ -1106,6 +1262,7 @@ graphic_alt = "-"
 
 [advance_orbital_foundries]
 name     = _("Orbital Foundries")
+class    = "Lattice"
 req1     = "Orbital Logistics"
 req2     = "Adaptive Fabrication"
 flags    = ""
@@ -1114,6 +1271,7 @@ graphic_alt = "-"
 
 [advance_orbital_ordnance]
 name     = _("Orbital Ordnance")
+class    = "Lattice"
 req1     = "Orbital Foundries"
 req2     = "Plasma Containment"
 flags    = ""
@@ -1123,6 +1281,7 @@ graphic_alt = "-"
 ; -- Undersea megacities --
 [advance_deep_habitation]
 name     = _("Deep Habitation")
+class    = "Lattice"
 req1     = "Abyssal Engineering"
 req2     = "Molecular Assembly"
 root_req = "Molecular Assembly"
@@ -1133,6 +1292,7 @@ graphic_alt = "-"
 ; -- Synthetic-mind endgame (Neural Uplink is the pure age-V orphan) --
 [advance_neural_uplink]
 name     = _("Neural Uplink")
+class    = "Lattice"
 req1     = "Cybernetic Symbiosis"
 req2     = "Synthetic Cognition"
 root_req = "Molecular Assembly"
@@ -1142,6 +1302,7 @@ graphic_alt = "-"
 
 [advance_autonomous_legions]
 name     = _("Autonomous Legions")
+class    = "Lattice"
 req1     = "Adaptive Fabrication"
 req2     = "Neural Uplink"
 flags    = ""
@@ -1151,6 +1312,7 @@ graphic_alt = "-"
 ; -- Solarpunk peak / eco-victory branch --
 [advance_living_architecture]
 name     = _("Living Architecture")
+class    = "Lattice"
 req1     = "Reclamation Science"
 req2     = "Molecular Assembly"
 root_req = "Molecular Assembly"
@@ -1160,6 +1322,7 @@ graphic_alt = "-"
 
 [advance_planetary_stewardship]
 name     = _("Planetary Stewardship")
+class    = "Lattice"
 req1     = "Living Architecture"
 req2     = "Closed Biospheres"
 flags    = ""
@@ -1169,6 +1332,7 @@ graphic_alt = "-"
 ; -- AI/tech-victory capstone --
 [advance_ascendant_intelligence]
 name     = _("Ascendant Intelligence")
+class    = "Lattice"
 req1     = "Neural Uplink"
 req2     = "Fusion Lattices"
 flags    = ""

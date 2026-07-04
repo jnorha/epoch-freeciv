@@ -180,6 +180,64 @@ const CATALOG: Record<string, Asset> = {
     outDir: "../../tileset/epoch/src/buildings",
     aspect: "3:4",
   },
+  aquaculture_bay: {
+    anchor: "building",
+    subject:
+      "a submerged aquaculture bay building, a broad low glass-roofed reef pavilion with rows of " +
+      "glowing green kelp vats and cylindrical fish-tank tubes, teal water and lime " +
+      "bioluminescence, brass framework",
+    outDir: "../../tileset/epoch/src/buildings",
+  },
+  deep_habitat: {
+    anchor: "building",
+    subject:
+      "a deep-sea megacity habitat core, a massive spherical pressure-dome arcology raised on " +
+      "three thick stilt-legs, stacked ring balconies and glowing blue windows, pearl-white and " +
+      "deep-blue plating",
+    outDir: "../../tileset/epoch/src/buildings",
+  },
+  verdant_engine: {
+    anchor: "building",
+    subject:
+      "a planetary biosphere engine wonder, a vast domed terraforming machine ringed with " +
+      "rotating green atmosphere-processor vanes and cascading vine gardens, emerald and warm " +
+      "gold, a glowing core",
+    outDir: "../../tileset/epoch/src/buildings",
+  },
+  ascendant_nexus: {
+    anchor: "building",
+    subject:
+      "a civilization-scale supermind wonder, a towering crystalline AI data-cathedral of " +
+      "stacked glowing server monoliths and floating holographic rings, deep violet and electric " +
+      "cyan, cold radiant light",
+    outDir: "../../tileset/epoch/src/buildings",
+    aspect: "3:4",
+  },
+  skyhook_terminus: {
+    anchor: "building",
+    subject:
+      "a space-elevator ground terminus wonder, a colossal reinforced anchor-tower with a taut " +
+      "tether cable rising straight into the sky and a mass-driver ring at its base, white steel " +
+      "and warning-amber, tall vertical silhouette",
+    outDir: "../../tileset/epoch/src/buildings",
+    aspect: "3:4",
+  },
+  gaia_compact: {
+    anchor: "building",
+    subject:
+      "a solarpunk world-treaty hall wonder, a serene circular colonnaded parliament of living " +
+      "white marble wrapped in flowering vines, a central seed-of-life sculpture, ivory and soft " +
+      "green, ceremonial and architectural",
+    outDir: "../../tileset/epoch/src/buildings",
+  },
+  abyssal_archive: {
+    anchor: "building",
+    subject:
+      "an undersea knowledge-vault wonder, a monumental sunken library ziggurat of stacked " +
+      "illuminated glass archive-galleries encased in a pressure shell, bronze and deep-teal, " +
+      "warm reading light glowing within",
+    outDir: "../../tileset/epoch/src/buildings",
+  },
 };
 
 // ---------------------------------------------------------------------------

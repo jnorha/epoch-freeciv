@@ -25,4 +25,11 @@ pixel_border = 0
 tiles = { "row", "column", "tag"
   0, 0, "b.abyssal_foundry"
   0, 1, "b.world_tree_spire"
+  0, 2, "b.aquaculture_bay"
+  0, 3, "b.deep_habitat"
+  1, 0, "b.verdant_engine"
+  1, 1, "b.ascendant_nexus"
+  1, 2, "b.skyhook_terminus"
+  1, 3, "b.gaia_compact"
+  2, 0, "b.abyssal_archive"
 }

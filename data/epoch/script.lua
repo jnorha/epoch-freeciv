@@ -397,6 +397,28 @@ EPOCH_ERAS = {
   [5] = { id = "lattice", label = "The Lattice Age" },
 }
 
+-- ------------------------------------------------------------
+-- EPOCH_CONFIG — the single documented tuning surface (roadmap doctrine §2).
+-- era_cost_pct MIRRORS the [techclass_*] cost_pct values in techs.ruleset (the
+-- engine reads the ruleset, not this table; kept here so all balance knobs are
+-- discoverable in one place and so tuning tools can read them). KEEP IN SYNC
+-- with techs.ruleset. PACING = "accelerating future grind" (not flat shares):
+-- time-to-cross each age rises on a convex curve so the far-future is a
+-- deliberate long-game investment that can't be rushed to dominate. Dynamo is
+-- discounted (its 45-tech COUNT already makes it the longest historical age);
+-- the steep cost is concentrated in Helix/Lattice. Retune from the age-duration
+-- curve printed by scripts/epoch-era-autogame.sh.
+-- ------------------------------------------------------------
+EPOCH_CONFIG = {
+  era_cost_pct = {
+    [1] = 100,  -- Ember   (normal establishment)
+    [2] = 115,  -- Compass (slight rise)
+    [3] = 70,   -- Dynamo  (discounted — length is 45-tech-count-driven)
+    [4] = 250,  -- Helix   (~3.5x jump: the "true future" difficulty spike)
+    [5] = 600,  -- Lattice (~2.4x again: whole-game-length endgame grind)
+  },
+}
+
 -- tech (rule) name -> age number. Single source of truth for era buckets.
 EPOCH_TECH_AGE = {
   -- Age I — Ember (26)

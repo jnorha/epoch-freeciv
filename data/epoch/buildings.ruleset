@@ -592,7 +592,7 @@ reqs	=
       "Building", "Harbour", "City"
       "TerrainFlag", "Sea", "Adjacent"
     }
-graphic         = "b.harbor"
+graphic         = "b.aquaculture_bay"
 graphic_alt     = "b.harbour"
 graphic_alt2    = "-"
 obsolete_by	=
@@ -621,7 +621,7 @@ reqs	=
       "Building", "Aquaculture Bay", "City"
       "TerrainFlag", "Sea", "Adjacent"
     }
-graphic         = "b.harbor"
+graphic         = "b.deep_habitat"
 graphic_alt     = "b.harbour"
 graphic_alt2    = "-"
 obsolete_by	=
@@ -2361,8 +2361,8 @@ reqs	=
     { "type", "name", "range"
       "Tech", "Planetary Stewardship", "Player"
     }
-graphic         = "b.hanging_gardens"
-graphic_alt     = "-"
+graphic         = "b.verdant_engine"
+graphic_alt     = "b.hanging_gardens"
 graphic_alt2    = "-"
 obsolete_by	=
     { "type", "name", "range"
@@ -2387,8 +2387,8 @@ reqs	=
     { "type", "name", "range"
       "Tech", "Ascendant Intelligence", "Player"
     }
-graphic         = "b.internet"
-graphic_alt     = "-"
+graphic         = "b.ascendant_nexus"
+graphic_alt     = "b.internet"
 graphic_alt2    = "-"
 obsolete_by	=
     { "type", "name", "range"
@@ -2412,8 +2412,8 @@ reqs	=
     { "type", "name", "range"
       "Tech", "Skyhook Tethers", "Player"
     }
-graphic         = "b.apollo_program"
-graphic_alt     = "-"
+graphic         = "b.skyhook_terminus"
+graphic_alt     = "b.apollo_program"
 graphic_alt2    = "-"
 obsolete_by	=
     { "type", "name", "range"
@@ -2466,8 +2466,8 @@ reqs	=
       "Tech", "Planetary Stewardship", "Player"
       "Gov", "Stewardship", "Player"
     }
-graphic         = "b.hanging_gardens"
-graphic_alt     = "-"
+graphic         = "b.gaia_compact"
+graphic_alt     = "b.hanging_gardens"
 graphic_alt2    = "-"
 obsolete_by	=
     { "type", "name", "range"
@@ -2494,8 +2494,8 @@ reqs	=
       "Tech", "Deep Habitation", "Player"
       "TerrainClass", "Oceanic", "Adjacent"
     }
-graphic         = "b.great_library"
-graphic_alt     = "-"
+graphic         = "b.abyssal_archive"
+graphic_alt     = "b.great_library"
 graphic_alt2    = "-"
 obsolete_by	=
     { "type", "name", "range"
