@@ -612,6 +612,62 @@ past their subsistence ceiling. Requires a Harbor and knowledge of Pressure \
 Ecology.\
 ")
 
+[building_deep_habitat]
+name		= _("Deep Habitat")
+genus		= "Improvement"
+reqs	=
+    { "type", "name", "range"
+      "Tech", "Deep Habitation", "Player"
+      "Building", "Aquaculture Bay", "City"
+      "TerrainFlag", "Sea", "Adjacent"
+    }
+graphic         = "b.harbor"
+graphic_alt     = "b.harbour"
+graphic_alt2    = "-"
+obsolete_by	=
+    { "type", "name", "range"
+    }
+build_cost	= 160
+upkeep		= 3
+sabotage	= 100
+sound           = "b_harbor"
+sound_alt       = "b_harbour"
+sound_alt2      = "b_generic"
+helptext	= _("\
+The Lattice-age capstone of the undersea food ladder: a self-sustaining \
+biosphere city-block. Adds a third food resource to every Ocean and Deep \
+Ocean tile the city works (stacking with Harbor and Aquaculture Bay) and \
+keeps a crowded undersea metropolis content. Requires an Aquaculture Bay and \
+Deep Habitation.\
+")
+
+[building_abyssal_foundry]
+name		= _("Abyssal Foundry")
+genus		= "Improvement"
+reqs	=
+    { "type", "name", "range"
+      "Tech", "Fusion Lattices", "Player"
+      "TerrainClass", "Oceanic", "Adjacent"
+    }
+graphic         = "b.offshore_platform"
+graphic_alt     = "-"
+graphic_alt2    = "-"
+obsolete_by	=
+    { "type", "name", "range"
+    }
+build_cost	= 180
+upkeep		= 3
+sabotage	= 100
+sound           = "b_factory"
+sound_alt       = "b_generic"
+helptext	= _("\
+Ocean tiles yield no shields on their own, which starves undersea cities of \
+production. The Abyssal Foundry solves it: fusion-driven seafloor fabricators \
+add a shield to every ocean tile the city works and boost the city's overall \
+production. It is the undersea answer to the Factory. Requires Fusion \
+Lattices.\
+")
+
 [building_hydro_plant]
 name		= _("Hydro Plant")
 genus		= "Improvement"

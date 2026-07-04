@@ -126,10 +126,33 @@ undersea cities). Aquaculture's value is faster growth + food headroom for late-
 exactly mirroring the land Granary → Supermarket food ladder. Building vs. tile-extra trade recorded
 in `feature-ocean-cities.md` §5b (building = city-wide/zero-effort; extra = per-tile/PW-targetable).
 
-**Deferred (rest of 2.2):** Undersea Mine (Oil Platform re-gate, needs an Offshore-Platform-style
-shield effect); a Lattice-tier ocean-food building (Deep Habitation) if more headroom is wanted;
-Buoy re-use; solarpunk arrays; the ocean-native undersea worker unit (only needed once *tile*
-extras like Sea Tunnel are built in normal play rather than via Public Works).
+### 5c. The full undersea building ladder — a megacity growth path (✅ 2026-07-04)
+Extended the building chain into the Lattice age so water cities have a complete growth arc, and
+solved the ocean **production** weakness (ocean tiles yield 0 shields). Two Lattice buildings added:
+
+| Building | Tech | Effects |
+|---|---|---|
+| **Deep Habitat** | Deep Habitation | `Output_Add_Tile +1 Food` on Sea tiles (3rd food tier → 4 food/ocean tile with Harbor+Aquaculture) + `Make_Content 3` (megacity stability). Requires Aquaculture Bay. |
+| **Abyssal Foundry** | Fusion Lattices | `Output_Add_Tile +1 Shield` on Oceanic tiles + `Output_Bonus 50%` Shield — the undersea Factory. Fixes the 0-shield problem. |
+
+**Key realisation — the size PATH already exists on stock buildings.** The **plain Aqueduct**
+(`Tech Construction` + *not* river/lake-adjacent, `buildings.ruleset:117`) is exactly the variant a
+salt-ocean city qualifies for → `Size_Adj +8` (cap 16); **Sewer System** (`Sanitation`) →
+`Size_Unlimit`. So undersea cities climb the standard Aqueduct→Sewer cap ladder; the old size-6
+plateau was **happiness**, not the cap (which is why Deep Habitat's `Make_Content` matters).
+
+**Full-ladder growth spike — undersea MEGACITY confirmed.** A shelf city given the complete stack
+(Harbour, Aquaculture Bay, Deep Habitat, Aqueduct, Sewer System, Offshore Platform, Abyssal Foundry,
+Temple, Marketplace, Granary — all 10 resolved) grew **5 → 9 (t20) → 12 → 15 → 18 → 23 → 25 (t63)
+and still climbing**, versus Harbor-only stalling at 6. The water-city growth arc is complete on
+buildings alone: **food** (Harbor→Aquaculture→Deep Habitat) · **size** (Aqueduct→Sewer) ·
+**stability** (Temple + Deep Habitat content + Marketplace) · **production** (Offshore Platform→
+Abyssal Foundry). All of these are buildable by an undersea city (coastal/ocean-adjacent by nature).
+
+**Deferred (rest of 2.2):** the **Undersea Worker** unit + *tile* improvements it builds (Kelp Farm
+food/trade extra via the proven `causes="Base"` Buoy pattern; Undersea Mine via Oil Platform);
+solarpunk arrays. These add per-tile variety + Public-Works flavour on top of the (already complete)
+building ladder — a want, not a need.
 
 ## 6. Open questions
 - **Sea Tunnel movement semantics:** does `causes="Road"` on ocean grant the road move bonus, or

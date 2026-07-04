@@ -2120,6 +2120,47 @@ reqs    =
       "OutputType", "Food", "Local", TRUE
     }
 
+; Epoch 2.2 — Deep Habitat (Lattice): 3rd ocean-food tier + keeps big undersea
+; cities content (stability for the megacity endgame).
+[effect_deep_habitat]
+type    = "Output_Add_Tile"
+value   = 1
+reqs    =
+    { "type", "name", "range", "present"
+      "TerrainFlag", "Sea", "Tile", TRUE
+      "Building", "Deep Habitat", "City", TRUE
+      "OutputType", "Food", "Local", TRUE
+    }
+
+[effect_deep_habitat_content]
+type    = "Make_Content"
+value   = 3
+reqs    =
+    { "type", "name", "range", "present"
+      "Building", "Deep Habitat", "City", TRUE
+    }
+
+; Epoch 2.2 — Abyssal Foundry (Lattice): gives ocean cities production. Ocean
+; tiles yield 0 shields; +1 shield/ocean tile + a 50% production bonus fixes it.
+[effect_abyssal_foundry_tile]
+type    = "Output_Add_Tile"
+value   = 1
+reqs    =
+    { "type", "name", "range", "present"
+      "TerrainClass", "Oceanic", "Tile", TRUE
+      "Building", "Abyssal Foundry", "City", TRUE
+      "OutputType", "Shield", "Local", TRUE
+    }
+
+[effect_abyssal_foundry_bonus]
+type    = "Output_Bonus"
+value   = 50
+reqs    =
+    { "type", "name", "range", "present"
+      "Building", "Abyssal Foundry", "City", TRUE
+      "OutputType", "Shield", "Local", TRUE
+    }
+
 [effect_hydro_plant]
 type    = "Output_Bonus"
 value   = 25
