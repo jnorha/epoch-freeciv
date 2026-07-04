@@ -435,8 +435,14 @@ EPOCH_TECH_AGE = {
   ["Synthetic Cognition"]=4, ["Closed Biospheres"]=4,
   ["Reclamation Science"]=4, ["Directed Energy"]=4,
   ["Orbital Logistics"]=4,
-  -- Age V — Lattice (Slice 1 skeleton: anchor + one leaf; full 14 in Slice 3)
+  -- Age V — Lattice (14: full age wired in Slice 3; tree complete at 115)
   ["Molecular Assembly"]=5, ["Metamaterials"]=5,
+  ["Adaptive Fabrication"]=5, ["Plasma Containment"]=5,
+  ["Fusion Lattices"]=5, ["Skyhook Tethers"]=5,
+  ["Orbital Foundries"]=5, ["Orbital Ordnance"]=5,
+  ["Deep Habitation"]=5, ["Neural Uplink"]=5,
+  ["Autonomous Legions"]=5, ["Living Architecture"]=5,
+  ["Planetary Stewardship"]=5, ["Ascendant Intelligence"]=5,
 }
 
 -- Resolved lookups, built lazily (find.tech_type is safe once rules are loaded).

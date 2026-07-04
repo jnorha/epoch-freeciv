@@ -1046,3 +1046,131 @@ req2     = "Machine Cognition"
 flags    = ""
 graphic     = "a.computers"
 graphic_alt = "-"
+
+; ==========================================================================
+; Epoch Slice 3 — full Lattice age (V). The 12 remaining Lattice techs
+; (Molecular Assembly anchor + Metamaterials shipped Slice 1-2). Real req1/req2
+; per doc/design/epoch-tech-tree.md §4/§5. Completes the tree at 115 techs.
+;
+; root_req strategy (same principle as Slice 2's Genome Cartography fix, now
+; for the Lattice anchor): explicit root_req = "Molecular Assembly" on the
+; Lattice ENTRY nodes that don't otherwise inherit it —
+;   - Adaptive Fabrication (MA + Machine Cognition): MA is req1 but theft
+;     ignores req1, and the MA anchor carries no root_req to pass down.
+;   - Deep Habitation (Abyssal Engineering + MA) and Living Architecture
+;     (Reclamation Science + MA): same — req1 is a Helix tech (carries GC not
+;     MA), req2 is the bare anchor.
+;   - Neural Uplink (Cybernetic Symbiosis + Synthetic Cognition): the pure
+;     orphan — BOTH prereqs are Helix, neither touches the Lattice anchor, so
+;     without this it would be an age-V tech reachable with only age-IV techs.
+; Everything else (Plasma Containment, Skyhook Tethers, Fusion Lattices,
+; Orbital Foundries/Ordnance, Autonomous Legions, Planetary Stewardship,
+; Ascendant Intelligence) inherits MA through one of those + inherits GC
+; through its Helix ancestry, so age V requires BOTH anchors by construction.
+; ==========================================================================
+
+; -- Industry / materials fork off the anchor --
+[advance_adaptive_fabrication]
+name     = _("Adaptive Fabrication")
+req1     = "Molecular Assembly"
+req2     = "Machine Cognition"
+root_req = "Molecular Assembly"
+flags    = ""
+graphic     = "a.superconductors"
+graphic_alt = "-"
+
+[advance_plasma_containment]
+name     = _("Plasma Containment")
+req1     = "Directed Energy"
+req2     = "Metamaterials"
+flags    = ""
+graphic     = "a.superconductors"
+graphic_alt = "-"
+
+[advance_fusion_lattices]
+name     = _("Fusion Lattices")
+req1     = "Fusion Power"
+req2     = "Metamaterials"
+flags    = ""
+graphic     = "a.superconductors"
+graphic_alt = "-"
+
+; -- Orbital tier (Gap 3: weapon platforms) --
+[advance_skyhook_tethers]
+name     = _("Skyhook Tethers")
+req1     = "Orbital Logistics"
+req2     = "Metamaterials"
+flags    = ""
+graphic     = "a.superconductors"
+graphic_alt = "-"
+
+[advance_orbital_foundries]
+name     = _("Orbital Foundries")
+req1     = "Orbital Logistics"
+req2     = "Adaptive Fabrication"
+flags    = ""
+graphic     = "a.computers"
+graphic_alt = "-"
+
+[advance_orbital_ordnance]
+name     = _("Orbital Ordnance")
+req1     = "Orbital Foundries"
+req2     = "Plasma Containment"
+flags    = ""
+graphic     = "a.computers"
+graphic_alt = "-"
+
+; -- Undersea megacities --
+[advance_deep_habitation]
+name     = _("Deep Habitation")
+req1     = "Abyssal Engineering"
+req2     = "Molecular Assembly"
+root_req = "Molecular Assembly"
+flags    = ""
+graphic     = "a.genetic_engineering"
+graphic_alt = "-"
+
+; -- Synthetic-mind endgame (Neural Uplink is the pure age-V orphan) --
+[advance_neural_uplink]
+name     = _("Neural Uplink")
+req1     = "Cybernetic Symbiosis"
+req2     = "Synthetic Cognition"
+root_req = "Molecular Assembly"
+flags    = ""
+graphic     = "a.computers"
+graphic_alt = "-"
+
+[advance_autonomous_legions]
+name     = _("Autonomous Legions")
+req1     = "Adaptive Fabrication"
+req2     = "Neural Uplink"
+flags    = ""
+graphic     = "a.computers"
+graphic_alt = "-"
+
+; -- Solarpunk peak / eco-victory branch --
+[advance_living_architecture]
+name     = _("Living Architecture")
+req1     = "Reclamation Science"
+req2     = "Molecular Assembly"
+root_req = "Molecular Assembly"
+flags    = ""
+graphic     = "a.genetic_engineering"
+graphic_alt = "-"
+
+[advance_planetary_stewardship]
+name     = _("Planetary Stewardship")
+req1     = "Living Architecture"
+req2     = "Closed Biospheres"
+flags    = ""
+graphic     = "a.genetic_engineering"
+graphic_alt = "-"
+
+; -- AI/tech-victory capstone --
+[advance_ascendant_intelligence]
+name     = _("Ascendant Intelligence")
+req1     = "Neural Uplink"
+req2     = "Fusion Lattices"
+flags    = ""
+graphic     = "a.computers"
+graphic_alt = "-"

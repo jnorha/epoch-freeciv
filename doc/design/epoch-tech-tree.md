@@ -188,7 +188,20 @@ Smoke-test each slice against `scripts/epoch-smoke-test.sh` (Phase 3 discipline)
   holds (Machine Cognition & Directed Energy `can_research == false` without the anchor, `true`
   with it). Undersea (Pressure/Abyssal) + cyborg/AI (Cybernetic/Machine/Synthetic Cognition)
   branch points now exist — unblocks 2.1/2.2 and Helix units (1.2).
-- **Slice 3 — Full Lattice (14).** Tree complete at 115. Orbital (3.2), solarpunk PW (3.3), victory hooks (3.4) gated. Long autogame (200+ turns): every era transition fires once, monotonically.
+- **Slice 3 — Full Lattice (14). ✅ DONE (2026-07-03).** Added the 12 remaining Lattice advances
+  with real `req1/req2` (Adaptive Fabrication, Plasma Containment, Fusion Lattices, Skyhook
+  Tethers, Orbital Foundries, Orbital Ordnance, Deep Habitation, Neural Uplink, Autonomous
+  Legions, Living Architecture, Planetary Stewardship, Ascendant Intelligence); seeded explicit
+  `root_req = Molecular Assembly` on the 4 Lattice entry nodes (Adaptive Fabrication, Deep
+  Habitation, Living Architecture, and the pure orphan **Neural Uplink**); extended
+  `EPOCH_TECH_AGE` (all 14 Lattice at age 5). **Tree complete at 115 techs.** **Verified
+  in-container:** clean load; tech→age map = **115 techs, 0 unmatched**; era fires to age 5;
+  and the **both-anchor gate** holds on Neural Uplink — with its Helix prereqs held it is
+  `can_research == false` when *either* Molecular Assembly (explicit `root_req`) *or* Genome
+  Cartography (inherited via ancestry) is missing, flipping `true` only when both are present.
+  Orbital (3.2), undersea megacities, solarpunk PW (3.3), and victory-branch capstones
+  (Planetary Stewardship / Ascendant Intelligence, 3.4) are now gated in the graph.
+  *(Deferred to Slice 4: the 200+-turn monotonic-transition autogame + `cost_pct` tuning.)*
 - **Slice 4 — Tuning + cut/merge.** Tune the five `cost_pct` multipliers to hit §1 span targets; execute §3 cut/merge with 1.2 unit rehoming (move units once). Surface multipliers in `EPOCH_CONFIG`.
 
 **Why this order:** Slices 0–1 de-risk the two things that can silently break the backbone — detection semantics and `root_req` gating — with ~4 techs and the existing tree, before large content investment. Tech *names* are stable by end of Slice 3, so parallel content can start against Helix names after Slice 2.
