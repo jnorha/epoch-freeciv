@@ -1177,3 +1177,126 @@ function epoch_covert_op(action, actor, target_unit)
                     string.format("unit=%d", target_unit.id))
 end
 signal.connect("action_started_unit_unit", "epoch_covert_op")
+
+-- ------------------------------------------------------------
+-- Typed trade goods + route complementarity (backlog 2.4).
+-- CtP2's "supply what they demand": a city's GOODS are the trade-special
+-- extras (terrain.ruleset resources) inside its work radius. When a
+-- TradeRoute unit (Caravan/Freight) establishes a route, its owner earns a
+-- one-time gold windfall scaled by how COMPLEMENTARY the two cities' goods
+-- are — goods each end has that the other lacks. Identical baskets pay
+-- nothing extra; distinct partners profit.
+--
+-- Hook (verified in unithand.c / script_server.c, 2026-07-04): both
+-- ACTRES_TRADE_ROUTE ("Establish Trade Route") and ACTRES_MARKETPLACE
+-- ("Enter Marketplace") run through ACTION_PERFORM_UNIT_CITY, which emits
+--   action_started_unit_city(action, actor, city)   BEFORE
+--   do_unit_establish_trade(), and
+--   action_finished_unit_city(action, success, actor, city)  AFTER it.
+-- The Caravan is CONSUMED on success, so the finished signal carries a NIL
+-- actor exactly in the case we want to pay — hence the two-phase handler:
+-- "started" captures the home city while the actor is alive; "finished"
+-- awards only when success is true. The two emissions are back-to-back in
+-- one C call (a Lua handler here performs no nested actions), so a single
+-- pending slot is race-free. This is a SECOND handler on
+-- action_started_unit_city, coexisting with epoch_civic_op above — same
+-- multi-connect pattern as the two action_started_unit_tile handlers.
+-- ------------------------------------------------------------
+
+EPOCH_CONFIG.trade = {
+  -- The extras that count as trade GOODS (all exist in terrain.ruleset).
+  goods = { "Wine", "Silk", "Spice", "Gems", "Gold", "Furs", "Ivory",
+            "Whales" },
+  -- Gold per complementary good when a trade route is established.
+  value_per_good = 30,
+  -- "Enter Marketplace" (one-shot sale, no standing route) pays this % of
+  -- the establishment bonus. No enabler reaches it in the current
+  -- actions.ruleset; guarded here so enabling it later is ruleset-only.
+  marketplace_pct = 50,
+}
+
+-- Set (rule_name -> true) of trade goods present in the city's work radius,
+-- plus the count. Uses the city's actual radius (city:map_sq_radius(), a
+-- squared radius — exactly what Tile:circle_iterate() takes).
+function epoch_city_goods(city)
+  local goods = {}
+  local count = 0
+  local sq_radius = city:map_sq_radius()
+  for tile in city.tile:circle_iterate(sq_radius) do
+    for gi, gname in ipairs(EPOCH_CONFIG.trade.goods) do
+      if not goods[gname] and tile:has_extra(gname) then
+        goods[gname] = true
+        count = count + 1
+      end
+    end
+  end
+  return goods, count
+end
+
+local function epoch_goods_str(set)
+  local parts = {}
+  for gi, gname in ipairs(EPOCH_CONFIG.trade.goods) do
+    if set[gname] then parts[#parts + 1] = gname end
+  end
+  if #parts == 0 then return "none" end
+  return table.concat(parts, "+")
+end
+
+-- Pending route captured by the started-handler for the finished-handler.
+local epoch_trade_pending = nil
+
+function epoch_trade_started(action, actor, target_city)
+  local aname = action:rule_name()
+  if aname ~= "Establish Trade Route" and aname ~= "Enter Marketplace" then
+    return
+  end
+  epoch_trade_pending = nil
+  if actor == nil or target_city == nil then return end
+  local home = actor:get_homecity()
+  if home == nil or home.id == target_city.id then return end
+  epoch_trade_pending = {
+    player = actor.owner,
+    home_id = home.id,
+    target_id = target_city.id,
+  }
+end
+signal.connect("action_started_unit_city", "epoch_trade_started")
+
+function epoch_trade_finished(action, success, actor, target_city)
+  local aname = action:rule_name()
+  if aname ~= "Establish Trade Route" and aname ~= "Enter Marketplace" then
+    return
+  end
+  local pending = epoch_trade_pending
+  epoch_trade_pending = nil
+  if pending == nil or not success or target_city == nil then return end
+  if pending.target_id ~= target_city.id then return end
+  local home = find.city(pending.player, pending.home_id)
+  if home == nil then return end
+  local cfg = EPOCH_CONFIG.trade
+  local home_goods = epoch_city_goods(home)
+  local dest_goods = epoch_city_goods(target_city)
+  local comp = 0
+  for gi, gname in ipairs(cfg.goods) do
+    if home_goods[gname] and not dest_goods[gname] then comp = comp + 1 end
+    if dest_goods[gname] and not home_goods[gname] then comp = comp + 1 end
+  end
+  local bonus = cfg.value_per_good * comp
+  local kind = "establish"
+  if aname == "Enter Marketplace" then
+    kind = "marketplace"
+    bonus = math.floor(bonus * cfg.marketplace_pct / 100)
+  end
+  if bonus > 0 then
+    edit.change_gold(pending.player, bonus)
+    notify.event(pending.player, target_city.tile, E.SCRIPT,
+      _("Complementary goods! Your merchants clear %d extra gold on the %s route."),
+      bonus, target_city.name)
+  end
+  log.normal(string.format(
+    "[EPOCH][trade_route] kind=%s player_id=%d home=%d dest=%d home_goods=%s dest_goods=%s comp=%d bonus=%d turn=%d",
+    kind, pending.player.id, home.id, target_city.id,
+    epoch_goods_str(home_goods), epoch_goods_str(dest_goods), comp, bonus,
+    epoch_current_turn))
+end
+signal.connect("action_finished_unit_city", "epoch_trade_finished")
