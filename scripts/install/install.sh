@@ -278,6 +278,19 @@ sudo setfacl -m d:u:$(id -u):rwX,u:$(id -u):rwx webapps
 mkdir -p webapps/data/{savegames/pbem,scorelogs,ranklogs}
 setfacl -Rm d:u:tomcat:rwX webapps/data
 
+# Tomcat >= 10.1.42 caps multipart form parts at maxPartCount=50 by default
+# (hardening around CVE-2025-48988). Freeciv's metaserver registration POST is
+# multipart with 100+ parts (base fields + 6 per AI player + vn[]/vv[] setting
+# pairs), so under the default cap Tomcat silently drops ALL parameters, the
+# Metaserver servlet 400s every registration, the servers table stays empty,
+# and /civclientlauncher answers "No servers available for creating a new game
+# on." Raise the cap on every connector that already sets maxParameterCount.
+# (Root-caused 2026-07-04 via loopback packet capture; threshold confirmed
+# empirically between 45 and 65 parts.)
+if ! sudo grep -q 'maxPartCount' conf/server.xml; then
+  sudo sed -i 's/maxParameterCount="1000"/maxParameterCount="1000"\n               maxPartCount="1000"/' conf/server.xml
+fi
+
 echo "==== Building freeciv ===="
 echo "Please be patient"
 
