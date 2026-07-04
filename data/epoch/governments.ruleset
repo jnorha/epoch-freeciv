@@ -436,6 +436,51 @@ _("\
 * Has a senate that may prevent declaration of war.\
 ")
 
+[government_stewardship]
+
+name        = _("Stewardship")
+reqs = { "type", "name", "range"
+         "tech", "Closed Biospheres", "Player"
+       }
+graphic     = "gov.democracy"
+graphic_alt = "-"
+sound       = "g_democracy"
+sound_alt   = "g_generic"
+sound_alt2  = "-"
+
+ruler_male_title = _("Steward %s")
+ruler_female_title = _("?female:Steward %s")
+
+helptext = _("\
+Stewardship is the solarpunk settlement of the Concordance: a cooperative,\
+ ecological order that tends the healed Earth in common. It offers excellent\
+ trade and keeps its people content across a sprawling empire, and its\
+ distributed logistics all but eliminate corruption over distance -- but its\
+ citizens have little stomach for war.\
+")
+
+[government_synthesis]
+
+name        = _("Synthesis")
+reqs = { "type", "name", "range"
+         "tech", "Synthetic Cognition", "Player"
+       }
+graphic     = "gov.communism"
+graphic_alt = "gov.democracy"
+sound       = "g_communism"
+sound_alt   = "g_generic"
+sound_alt2  = "-"
+
+ruler_male_title = _("Coordinator %s")
+ruler_female_title = _("?female:Coordinator %s")
+
+helptext = _("\
+Synthesis fuses human governance with recovered Soma cognition into a single\
+ optimising intelligence. Waste over distance vanishes, research and industry\
+ surge, and automated systems keep vast populations in order -- at the cost of\
+ the messier freedoms of older orders.\
+")
+
 ; /* <-- avoid gettext warnings
 ;
 ; Multipliers (aka policies)
