@@ -1,0 +1,101 @@
+name: deploy to droplet
+
+# Builds + restarts the Epoch image on the DigitalOcean droplet over SSH.
+#
+# The droplet already hosts a clone at /opt/epoch and builds the image locally
+# (`docker compose build`, ~20-30 min on the 2-core box), exactly as it was set
+# up by hand (see doc/ROADMAP.md 2026-07-02). This workflow automates that:
+# fetch the target ref, hard-checkout, rebuild, restart, health-check.
+#
+# ── One-time setup (repo Settings → Secrets and variables → Actions) ─────────
+#   DO_HOST     droplet IP or hostname            (e.g. 178.128.231.84)
+#   DO_USER     ssh user with docker access       (e.g. root, or a deploy user)
+#   DO_SSH_KEY  PRIVATE key (full PEM/OpenSSH) whose PUBLIC half is in that
+#               user's ~/.ssh/authorized_keys on the droplet. Generate a
+#               dedicated deploy key — do NOT reuse a personal key:
+#                 ssh-keygen -t ed25519 -f epoch_deploy -N ''
+#                 ssh-copy-id -i epoch_deploy.pub USER@HOST   # or paste the .pub
+#               then paste the PRIVATE file (epoch_deploy) as DO_SSH_KEY.
+#
+# ── Notes ────────────────────────────────────────────────────────────────────
+# * /opt/epoch is treated as a DEPLOY MIRROR: this does `git fetch` + a hard
+#   checkout of FETCH_HEAD, so any uncommitted droplet-local edits are wiped.
+#   Keep droplet changes in the repo (the publite2 hot-patch is already committed).
+# * Trigger is version tags + manual dispatch — NOT every push (a 20-30 min
+#   build per commit on a 2-core box is impractical). Tag a release (`git tag
+#   v0.1 && git push --tags`) or run the workflow manually with a ref.
+# * Port 22 must be reachable from GitHub's runners. The roadmap flags closing
+#   raw 22 in favour of Tailscale SSH; if/when that lands, swap the ssh step for
+#   the tailscale/github-action + `tailscale ssh`. Until then this uses key auth
+#   over public 22.
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Branch, tag, or commit to deploy'
+        required: true
+        default: 'develop'
+
+concurrency:
+  group: deploy-droplet
+  cancel-in-progress: false   # never cancel a build mid-flight; queue instead
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - name: Resolve target ref
+        id: ref
+        run: echo "value=${{ github.event.inputs.ref || github.ref_name }}" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy over SSH
+        env:
+          DO_HOST: ${{ secrets.DO_HOST }}
+          DO_USER: ${{ secrets.DO_USER }}
+          DO_SSH_KEY: ${{ secrets.DO_SSH_KEY }}
+          REF: ${{ steps.ref.outputs.value }}
+        run: |
+          set -euo pipefail
+          if [ -z "${DO_HOST:-}" ] || [ -z "${DO_USER:-}" ] || [ -z "${DO_SSH_KEY:-}" ]; then
+            echo "::error::Missing DO_HOST / DO_USER / DO_SSH_KEY secrets. See the header of this workflow for setup."
+            exit 1
+          fi
+          mkdir -p ~/.ssh
+          printf '%s\n' "$DO_SSH_KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          ssh-keyscan -H "$DO_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          echo "==> Deploying ref '$REF' to $DO_USER@$DO_HOST"
+          ssh -i ~/.ssh/id_deploy \
+              -o ServerAliveInterval=30 -o ServerAliveCountMax=40 \
+              "$DO_USER@$DO_HOST" "DEPLOY_REF='$REF' bash -s" <<'REMOTE'
+          set -euo pipefail
+          cd /opt/epoch
+          echo "==> Fetching $DEPLOY_REF"
+          git fetch origin --tags --prune --force "$DEPLOY_REF"
+          git checkout -f FETCH_HEAD
+          echo "==> HEAD is now $(git rev-parse --short HEAD)"
+          echo "==> Building image (this takes ~20-30 min)"
+          docker compose build
+          echo "==> Restarting"
+          docker compose up -d
+          echo "==> Waiting for local health"
+          for i in $(seq 1 20); do
+            if curl -fsS http://localhost:8080/ >/dev/null 2>&1; then echo "local health OK"; break; fi
+            [ "$i" = 20 ] && { echo "::error::droplet did not become healthy on :8080"; docker compose ps; exit 1; }
+            sleep 6
+          done
+          REMOTE
+
+      - name: External health check
+        env:
+          DO_HOST: ${{ secrets.DO_HOST }}
+        run: |
+          set -euo pipefail
+          echo "==> External check http://$DO_HOST:8080/"
+          curl -fsS --retry 10 --retry-delay 10 "http://$DO_HOST:8080/" >/dev/null
+          echo "external health OK — deploy complete"
