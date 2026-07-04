@@ -1,0 +1,20 @@
+{
+  "name": "epoch-art",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Epoch art-generation pipeline (fal.ai: Flux.1-schnell + Nano Banana 2) + sprite post-processing.",
+  "scripts": {
+    "gen": "node --env-file=.env --import tsx gen.ts",
+    "process": "tsx process_sprite.ts"
+  },
+  "dependencies": {
+    "@fal-ai/client": "^1.10.1"
+  },
+  "devDependencies": {
+    "@types/pngjs": "^6.0.5",
+    "pngjs": "^7.0.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}
