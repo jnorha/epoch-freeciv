@@ -9,10 +9,12 @@
  *                       box (union of the frames' trim boxes) for all animation
  *                       frames so their scale/alignment matches exactly
  *   --size WxH          downscale to fit within WxH, preserving aspect ratio
+ *   --stretch WxH       resize to exactly WxH, ignoring aspect (iso tile squash)
  *   --scale N           alternative to --size: exact 1/N downscale
  *   --method box|nearest  downscale sampling (default box)
  *   --despeckle [N]     drop isolated opaque islands smaller than N px (default 6)
  *   --outline           draw a 1px dark rim around the silhouette (map-scale pop)
+ *   --diamond           mask alpha outside the 2:1 iso diamond (for 96x48 tile overlays)
  *   --contrast N        linear contrast boost on opaque pixels (e.g. 12; 0-50 sane)
  *   --pad WxH           center the result on a transparent WxH canvas
  *
@@ -61,6 +63,7 @@ const padArg = arg("pad");
 const doDespeckle = flag("despeckle");
 const despeckleMin = arg("despeckle") ? Number(arg("despeckle")) : 6;
 const doOutline = flag("outline");
+const doDiamond = flag("diamond");
 const contrastArg = arg("contrast") ? Number(arg("contrast")) : 0;
 
 type Img = InstanceType<typeof PNG>;
@@ -236,7 +239,11 @@ console.log(`in: ${path.relative(process.cwd(), inPath)} (${img.width}×${img.he
 if (removeBg) floodRemoveBg(img, bgTol);
 if (cropArg) img = cropBox(img, cropArg);
 else if (doTrim) img = trim(img);
-if (sizeArg) {
+const stretchArg = arg("stretch");
+if (stretchArg) {
+  const { w, h } = parseWxH(stretchArg);
+  img = downscale(img, w, h);
+} else if (sizeArg) {
   const { w, h } = parseWxH(sizeArg);
   const scale = Math.min(w / img.width, h / img.height);
   img = downscale(img, Math.max(1, Math.round(img.width * scale)), Math.max(1, Math.round(img.height * scale)));
@@ -248,6 +255,17 @@ if (padArg) { const { w, h } = parseWxH(padArg); img = pad(img, w, h); }
 // contrast/outline run after pad so the rim has canvas margin to land on
 if (contrastArg > 0) contrast(img, contrastArg);
 if (doOutline) outline(img);
+if (doDiamond) {
+  // 2:1 iso diamond mask: keep pixels where |x-cx|/(w/2) + |y-cy|/(h/2) <= 1
+  const cw = img.width, ch = img.height;
+  let cleared = 0;
+  for (let y = 0; y < ch; y++) for (let x = 0; x < cw; x++) {
+    const nx = Math.abs((x + 0.5) - cw / 2) / (cw / 2);
+    const ny = Math.abs((y + 0.5) - ch / 2) / (ch / 2);
+    if (nx + ny > 1) { img.data[(y * cw + x) * 4 + 3] = 0; cleared++; }
+  }
+  console.log(`diamond: masked ${cleared} px outside the iso diamond`);
+}
 fs.mkdirSync(path.dirname(outPath), { recursive: true });
 fs.writeFileSync(outPath, PNG.sync.write(img));
 console.log(`out: ${path.relative(process.cwd(), outPath)} (${img.width}×${img.height})`);

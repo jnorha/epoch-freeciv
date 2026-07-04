@@ -1,0 +1,18 @@
+{
+  "cell": "96x48",
+  "gfx": "amplio2/epoch_extras",
+  "out": "../../../tileset/epoch/web/epoch_extras",
+  "columns": 5,
+  "sprites": [
+    { "tag": "extra.kelp_farm", "file": "../../../tileset/epoch/src/extras/kelp_farm_96x48.png" },
+    { "tag": "road.sea_tunnel_n", "file": "../../../tileset/epoch/src/extras/sea_tunnel_n.png" },
+    { "tag": "road.sea_tunnel_e", "file": "../../../tileset/epoch/src/extras/sea_tunnel_e.png" },
+    { "tag": "road.sea_tunnel_s", "file": "../../../tileset/epoch/src/extras/sea_tunnel_s.png" },
+    { "tag": "road.sea_tunnel_w", "file": "../../../tileset/epoch/src/extras/sea_tunnel_w.png" },
+    { "tag": "road.sea_tunnel_ne", "file": "../../../tileset/epoch/src/extras/sea_tunnel_ne.png" },
+    { "tag": "road.sea_tunnel_se", "file": "../../../tileset/epoch/src/extras/sea_tunnel_se.png" },
+    { "tag": "road.sea_tunnel_sw", "file": "../../../tileset/epoch/src/extras/sea_tunnel_sw.png" },
+    { "tag": "road.sea_tunnel_nw", "file": "../../../tileset/epoch/src/extras/sea_tunnel_nw.png" },
+    { "tag": "road.sea_tunnel_isolated", "file": "../../../tileset/epoch/src/extras/sea_tunnel_isolated.png" }
+  ]
+}

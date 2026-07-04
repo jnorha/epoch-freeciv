@@ -1549,6 +1549,26 @@ function fill_path_sprite_array(ptile, pcity)
     result_sprites.push({"key" : "road.road_isolated"});
   }
 
+  /* Epoch: Sea Tunnel — a fourth path type (the stock code above hardcodes
+     road/rail/maglev; see the TODO on generic road types). Tunnels live on
+     ocean where the other paths can't exist, so they render independently:
+     one segment toward every adjacent tunnel tile, else an isolated hub. */
+  var tunnel_id = window["EXTRA_SEA TUNNEL"];
+  if (tunnel_id !== undefined && tile_has_extra(ptile, tunnel_id)) {
+    var tunnel_conn = false;
+    for (i = 0; i < 8; i++) {
+      var ttile = mapstep(ptile, i);
+      if (ttile != null && tile_get_known(ttile) != TILE_UNKNOWN
+          && tile_has_extra(ttile, tunnel_id)) {
+        result_sprites.push({"key" : "road.sea_tunnel_" + dir_get_tileset_name(i)});
+        tunnel_conn = true;
+      }
+    }
+    if (!tunnel_conn) {
+      result_sprites.push({"key" : "road.sea_tunnel_isolated"});
+    }
+  }
+
   return result_sprites;
 }
 
@@ -1613,6 +1633,13 @@ function fill_layer2_sprite_array(ptile, pcity)
     if (tile_has_extra(ptile, EXTRA_RUINS)) {
       result_sprites.push({"key" : "extra.ruins_mg",
                            "offset_y" : -normal_tile_height / 2});
+    }
+    /* Epoch: Kelp Farm undersea tile improvement — a flat 96x48 diamond
+       overlay, so no vertical offset (packhand defines EXTRA_* constants
+       from extra rule names; "Kelp Farm" contains a space, hence window[]). */
+    var kelp_id = window["EXTRA_KELP FARM"];
+    if (kelp_id !== undefined && tile_has_extra(ptile, kelp_id)) {
+      result_sprites.push({"key" : "extra.kelp_farm"});
     }
   }
 
