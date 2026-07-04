@@ -427,8 +427,14 @@ EPOCH_TECH_AGE = {
   ["Superconductors"]=3, ["Robotics"]=3, ["Plastics"]=3, ["Stealth"]=3,
   ["Recycling"]=3, ["Environmentalism"]=3, ["Genetic Engineering"]=3,
   ["Fusion Power"]=3, ["Networked Computing"]=3,
-  -- Age IV — Helix (Slice 1 skeleton: anchor + one leaf; full 13 in Slice 2)
+  -- Age IV — Helix (13: full age wired in Slice 2)
   ["Genome Cartography"]=4, ["Cellular Rewriting"]=4,
+  ["Chimeric Agriculture"]=4, ["Cultured Materials"]=4,
+  ["Pressure Ecology"]=4, ["Abyssal Engineering"]=4,
+  ["Cybernetic Symbiosis"]=4, ["Machine Cognition"]=4,
+  ["Synthetic Cognition"]=4, ["Closed Biospheres"]=4,
+  ["Reclamation Science"]=4, ["Directed Energy"]=4,
+  ["Orbital Logistics"]=4,
   -- Age V — Lattice (Slice 1 skeleton: anchor + one leaf; full 14 in Slice 3)
   ["Molecular Assembly"]=5, ["Metamaterials"]=5,
 }

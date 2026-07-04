@@ -121,7 +121,27 @@ Five signature throughlines, each starting at an Ember/Compass tech and ending a
 4. **Energy-weapon line (Compass→Lattice):** Physics → Laser + Fusion Power → **Directed Energy** → **Plasma Containment**.
 5. **Synthetic-mind line (Dynamo→Lattice), the great convergence:** (Computers → Networked Computing → Machine Cognition) + Robotics braid at **Synthetic Cognition**, which feeds BOTH **Molecular Assembly** and **Neural Uplink** — the intentional AI bottleneck of the endgame.
 
-**`root_req` usage — minimal:** only two anchors. **Genome Cartography** stamps the entire Helix+Lattice tree (makes undersea un-stealable pre-Helix). **Molecular Assembly** hard-gates pure-Lattice capabilities (programmable matter, orbital ordnance, deep cities). Where natural prereqs already route through an anchor, no explicit `root_req` needed — inheritance covers it. Add explicit `root_req` only on branch-entry nodes a sideways acquisition could otherwise satisfy (at most Pressure Ecology, Orbital Logistics if playtest shows a leak).
+**`root_req` usage — minimal, but corrected in Slice 2 (2026-07-03):** two anchors, plus
+explicit `root_req` on the ENTRY nodes that don't otherwise inherit the anchor. **Genome
+Cartography** stamps the entire Helix+Lattice tree; **Molecular Assembly** hard-gates
+pure-Lattice capabilities. The subtlety the original text missed: an anchor has *no* `root_req`
+itself (it must stay researchable), so its children do **not** inherit anything from it —
+`root_req` only flows from a tech that *has* one to that tech's dependents. Therefore every
+Helix **entry node** needs an explicit `root_req = "Genome Cartography"` to seed the
+inheritance; downstream techs then inherit automatically. The entry nodes are:
+- **Direct anchor children:** Cellular Rewriting, Chimeric Agriculture, Cultured Materials
+  (require GC via `req1`, but theft/trade ignore `req1`, so they still need `root_req`).
+- **Dynamo-rooted orphan lines** (the real leak the original "at most Pressure Ecology, Orbital
+  Logistics" guess missed): **Machine Cognition** (Networked Computing + Robotics) and
+  **Directed Energy** (Laser + Fusion Power) — neither prereq touches the anchor, so without
+  explicit `root_req` they'd be researchable/stealable while still Dynamo.
+
+Everything else (Pressure Ecology, Abyssal Engineering, Cybernetic Symbiosis, Synthetic
+Cognition, Closed Biospheres, Reclamation Science, Orbital Logistics) **inherits** GC through
+one of those entry nodes and needs nothing explicit. **Verified in Slice 2:** with req1+req2
+held, Machine Cognition and Directed Energy are `can_research == false` until Genome Cartography
+is known. The Lattice age will need the analogous treatment for **Molecular Assembly** on its
+own Dynamo/Helix-rooted entry nodes in Slice 3.
 
 **Key branch points:** Genome Cartography (bio/agri/materials fork), Synthetic Cognition (convergence), Molecular Assembly (weapons/industry/habitat/space fork), Living Architecture vs Autonomous Legions (solarpunk-vs-militarist → victory paths).
 
@@ -157,7 +177,17 @@ Smoke-test each slice against `scripts/epoch-smoke-test.sh` (Phase 3 discipline)
   (= `research_invention_state == TECH_PREREQS_KNOWN`) is the correct probe as it honors `root_req`.
   *Skeletal prereqs* (Molecular Assembly ← Cellular Rewriting only, etc.) get replaced by the full
   graph in Slices 2–3.
-- **Slice 2 — Full Helix (13).** Real prereq pairs. Undersea + cyborg/AI branch points exist and gate. Unblocks 2.1/2.2 and Helix units (1.2).
+- **Slice 2 — Full Helix (13). ✅ DONE (2026-07-03).** Added the 11 remaining Helix advances
+  with real `req1/req2` pairs (Chimeric Agriculture, Cultured Materials, Pressure Ecology,
+  Abyssal Engineering, Cybernetic Symbiosis, Machine Cognition, Synthetic Cognition, Closed
+  Biospheres, Reclamation Science, Directed Energy, Orbital Logistics); rewired Molecular
+  Assembly to its canonical prereqs (Cultured Materials + Synthetic Cognition, now available);
+  seeded explicit `root_req = Genome Cartography` on the 5 entry nodes (see §5 correction above);
+  extended `EPOCH_TECH_AGE` (all 13 Helix at age 4). **Verified in-container:** ruleset loads
+  clean; tech→age map = **103 techs, 0 unmatched**; era fires to age 4; the orphan-line gate
+  holds (Machine Cognition & Directed Energy `can_research == false` without the anchor, `true`
+  with it). Undersea (Pressure/Abyssal) + cyborg/AI (Cybernetic/Machine/Synthetic Cognition)
+  branch points now exist — unblocks 2.1/2.2 and Helix units (1.2).
 - **Slice 3 — Full Lattice (14).** Tree complete at 115. Orbital (3.2), solarpunk PW (3.3), victory hooks (3.4) gated. Long autogame (200+ turns): every era transition fires once, monotonically.
 - **Slice 4 — Tuning + cut/merge.** Tune the five `cost_pct` multipliers to hit §1 span targets; execute §3 cut/merge with 1.2 unit rehoming (move units once). Surface multipliers in `EPOCH_CONFIG`.
 

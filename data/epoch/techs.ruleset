@@ -906,13 +906,13 @@ flags    = ""
 graphic     = "a.genetic_engineering"
 graphic_alt = "-"
 
-; Lattice (V) ANCHOR. Skeletal prereq (real: Cultured Materials + Synthetic
-; Cognition). Descends from Cellular Rewriting, so it INHERITS root_req =
+; Lattice (V) ANCHOR. Canonical prereqs (wired in Slice 2 now that both exist).
+; Both parents descend from Genome Cartography, so it INHERITS root_req =
 ; Genome Cartography automatically — no age-V tech without age IV's anchor.
 [advance_molecular_assembly]
 name     = _("Molecular Assembly")
-req1     = "Cellular Rewriting"
-req2     = "None"
+req1     = "Cultured Materials"
+req2     = "Synthetic Cognition"
 flags    = ""
 graphic     = "a.superconductors"
 graphic_alt = "-"
@@ -928,4 +928,121 @@ req2     = "Superconductors"
 root_req = "Molecular Assembly"
 flags    = ""
 graphic     = "a.superconductors"
+graphic_alt = "-"
+
+; ==========================================================================
+; Epoch Slice 2 — full Helix age (IV). The 11 remaining Helix techs (Genome
+; Cartography + Cellular Rewriting shipped in Slice 1). Real req1/req2 pairs
+; per doc/design/epoch-tech-tree.md §4/§5.
+;
+; root_req strategy — enforce the age invariant ("no age-IV tech acquirable by
+; ANY means without Genome Cartography"): explicit root_req = "Genome
+; Cartography" goes on every Helix ENTRY node whose prereqs do not already
+; carry the anchor's root_req, i.e. the direct GC children (Chimeric
+; Agriculture, Cultured Materials) AND the two orphan lines whose prereqs are
+; all pre-anchor Dynamo techs (Machine Cognition = Networked Computing +
+; Robotics; Directed Energy = Laser + Fusion Power). Inheritance then stamps
+; every downstream Helix/Lattice tech. (Corrects the design doc §5's guess of
+; "at most Pressure Ecology, Orbital Logistics" — those inherit and need
+; nothing; the real gaps are the Dynamo-rooted lines. Graphics reuse existing
+; icons until the art pass.)
+; ==========================================================================
+
+; -- Bio / agriculture / materials fork (direct children of the anchor) --
+[advance_chimeric_agriculture]
+name     = _("Chimeric Agriculture")
+req1     = "Genome Cartography"
+req2     = "Refrigeration"
+root_req = "Genome Cartography"
+flags    = ""
+graphic     = "a.genetic_engineering"
+graphic_alt = "-"
+
+[advance_cultured_materials]
+name     = _("Cultured Materials")
+req1     = "Genome Cartography"
+req2     = "Plastics"
+root_req = "Genome Cartography"
+flags    = ""
+graphic     = "a.superconductors"
+graphic_alt = "-"
+
+; -- Undersea line (inherits root_req via Cellular Rewriting) --
+[advance_pressure_ecology]
+name     = _("Pressure Ecology")
+req1     = "Cellular Rewriting"
+req2     = "Superconductors"
+flags    = ""
+graphic     = "a.genetic_engineering"
+graphic_alt = "-"
+
+[advance_abyssal_engineering]
+name     = _("Abyssal Engineering")
+req1     = "Pressure Ecology"
+req2     = "Steel"
+flags    = ""
+graphic     = "a.genetic_engineering"
+graphic_alt = "-"
+
+; -- Cyborg line (inherits via Cellular Rewriting) --
+[advance_cybernetic_symbiosis]
+name     = _("Cybernetic Symbiosis")
+req1     = "Cellular Rewriting"
+req2     = "Robotics"
+flags    = ""
+graphic     = "a.genetic_engineering"
+graphic_alt = "-"
+
+; -- Synthetic-mind line. Machine Cognition is a Dynamo-rooted ENTRY node -> explicit root_req. --
+[advance_machine_cognition]
+name     = _("Machine Cognition")
+req1     = "Networked Computing"
+req2     = "Robotics"
+root_req = "Genome Cartography"
+flags    = ""
+graphic     = "a.computers"
+graphic_alt = "-"
+
+[advance_synthetic_cognition]
+name     = _("Synthetic Cognition")
+req1     = "Machine Cognition"
+req2     = "Cellular Rewriting"
+flags    = ""
+graphic     = "a.computers"
+graphic_alt = "-"
+
+; -- Solarpunk / ecology line (inherits via Chimeric Agriculture) --
+[advance_closed_biospheres]
+name     = _("Closed Biospheres")
+req1     = "Chimeric Agriculture"
+req2     = "Environmentalism"
+flags    = ""
+graphic     = "a.genetic_engineering"
+graphic_alt = "-"
+
+[advance_reclamation_science]
+name     = _("Reclamation Science")
+req1     = "Closed Biospheres"
+req2     = "Recycling"
+flags    = ""
+graphic     = "a.genetic_engineering"
+graphic_alt = "-"
+
+; -- Energy-weapon line. Directed Energy is a Dynamo-rooted ENTRY node -> explicit root_req. --
+[advance_directed_energy]
+name     = _("Directed Energy")
+req1     = "Laser"
+req2     = "Fusion Power"
+root_req = "Genome Cartography"
+flags    = ""
+graphic     = "a.superconductors"
+graphic_alt = "-"
+
+; -- Orbital line (inherits via Machine Cognition) --
+[advance_orbital_logistics]
+name     = _("Orbital Logistics")
+req1     = "Space Flight"
+req2     = "Machine Cognition"
+flags    = ""
+graphic     = "a.computers"
 graphic_alt = "-"
