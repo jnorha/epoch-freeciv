@@ -94,6 +94,76 @@ const CATALOG: Record<string, Asset> = {
       "solar fins, charcoal and amber, faint energy glow, no pilot",
     outDir: "../../tileset/epoch/src/units",
   },
+  cyborg_infantry: {
+    anchor: "unit",
+    subject:
+      "a single cyborg infantry soldier, augmented human in teal-steel powered armor with " +
+      "glowing amber cybernetic lines, compact rifle, bold chunky silhouette",
+    outDir: "../../tileset/epoch/src/units",
+  },
+  chimera_soldier: {
+    anchor: "unit",
+    subject:
+      "a single bio-engineered chimera soldier, organic bone-and-sinew armor in moss green " +
+      "and ivory, one clawed arm and one bio-rifle, feral crouched stance, bold silhouette",
+    outDir: "../../tileset/epoch/src/units",
+  },
+  combat_drone: {
+    anchor: "unit",
+    subject:
+      "a small hovering quad-rotor combat drone gunship, gunmetal grey with a single red " +
+      "sensor eye and underslung cannon, compact chunky silhouette",
+    outDir: "../../tileset/epoch/src/units",
+  },
+  pressure_sub: {
+    anchor: "unit",
+    subject:
+      "a deep-pressure attack submarine, dark teal angular reinforced hull, glowing cyan " +
+      "intake vents and torpedo tubes, predatory silhouette",
+    outDir: "../../tileset/epoch/src/units",
+  },
+  war_walker: {
+    anchor: "unit",
+    subject:
+      "a heavy bipedal war-walker mech, charcoal and amber plating, shoulder missile racks " +
+      "and twin arm cannons, wide stomping stance, very chunky readable silhouette",
+    outDir: "../../tileset/epoch/src/units",
+  },
+  plasma_trooper: {
+    anchor: "unit",
+    subject:
+      "a single heavy plasma trooper, bulky sealed armor in slate blue with white-hot plasma " +
+      "rifle and glowing blue energy cells, bold chunky silhouette",
+    outDir: "../../tileset/epoch/src/units",
+  },
+  synthetic_legion: {
+    anchor: "unit",
+    subject:
+      "a humanoid synthetic legionnaire robot soldier, chrome-white armored chassis with cyan " +
+      "glowing joints and faceplate, tall halberd-like energy weapon, clean bold silhouette",
+    outDir: "../../tileset/epoch/src/units",
+  },
+  plasma_cruiser: {
+    anchor: "unit",
+    subject:
+      "a sleek naval plasma cruiser warship, long dark hull with twin glowing blue plasma " +
+      "lance turrets and fin arrays, wake at the bow, bold silhouette",
+    outDir: "../../tileset/epoch/src/units",
+  },
+  space_plane: {
+    anchor: "unit",
+    subject:
+      "a sleek orbital spaceplane, white and amber delta-wing craft with glowing engine " +
+      "trail, banking slightly, elegant bold silhouette",
+    outDir: "../../tileset/epoch/src/units",
+  },
+  orbital_interceptor: {
+    anchor: "unit",
+    subject:
+      "an angular orbital interceptor fighter, dark gunmetal with crimson accents and " +
+      "forward-swept wings, twin railguns, aggressive bold silhouette",
+    outDir: "../../tileset/epoch/src/units",
+  },
   // --- Diamond-age buildings/wonders ---
   abyssal_foundry: {
     anchor: "building",

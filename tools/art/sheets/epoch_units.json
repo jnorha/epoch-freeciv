@@ -10,6 +10,16 @@
     { "tag": "u.abyssal_founder_Idle", "file": "../../../tileset/epoch/src/units/abyssal_founder_96.png" },
     { "tag": "u.weapon_platform_Idle", "file": "../../../tileset/epoch/src/units/weapon_platform_96.png" },
     { "tag": "u.weapon_platform_Idle_0", "file": "../../../tileset/epoch/src/units/weapon_platform_96.png" },
-    { "tag": "u.weapon_platform_Idle_1", "file": "../../../tileset/epoch/src/units/weapon_platform_f1_96.png" }
+    { "tag": "u.weapon_platform_Idle_1", "file": "../../../tileset/epoch/src/units/weapon_platform_f1_96.png" },
+    { "tag": "u.cyborg_infantry_Idle", "file": "../../../tileset/epoch/src/units/cyborg_infantry_96.png" },
+    { "tag": "u.chimera_soldier_Idle", "file": "../../../tileset/epoch/src/units/chimera_soldier_96.png" },
+    { "tag": "u.combat_drone_Idle", "file": "../../../tileset/epoch/src/units/combat_drone_96.png" },
+    { "tag": "u.pressure_sub_Idle", "file": "../../../tileset/epoch/src/units/pressure_sub_96.png" },
+    { "tag": "u.war_walker_Idle", "file": "../../../tileset/epoch/src/units/war_walker_96.png" },
+    { "tag": "u.plasma_trooper_Idle", "file": "../../../tileset/epoch/src/units/plasma_trooper_96.png" },
+    { "tag": "u.synthetic_legion_Idle", "file": "../../../tileset/epoch/src/units/synthetic_legion_96.png" },
+    { "tag": "u.plasma_cruiser_Idle", "file": "../../../tileset/epoch/src/units/plasma_cruiser_96.png" },
+    { "tag": "u.space_plane_Idle", "file": "../../../tileset/epoch/src/units/space_plane_96.png" },
+    { "tag": "u.orbital_interceptor_Idle", "file": "../../../tileset/epoch/src/units/orbital_interceptor_96.png" }
   ]
 }
