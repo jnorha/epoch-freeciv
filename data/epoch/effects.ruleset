@@ -2521,6 +2521,156 @@ reqs    =
       "Gov", "Synthesis", "Player"
     }
 
+; ---------------------------------------------------------------------------
+; Fascism: militarist war-machine — free army, martial law, hot factories,
+;   but throttled science and distance graft.
+; Corporate Republic: capitalist gold-engine — tax bonus, rich trade, but no
+;   free military support and greedy distance corruption.
+; ---------------------------------------------------------------------------
+
+; --- Fascism ---
+[effect_max_rates_fascism]
+type    = "Max_Rates"
+value   = 70
+reqs    =
+    { "type", "name", "range"
+      "Gov", "Fascism", "Player"
+    }
+
+[effect_empire_size_base_fascism]
+type    = "Empire_Size_Base"
+value   = 16
+reqs    =
+    { "type", "name", "range"
+      "Gov", "Fascism", "Player"
+    }
+
+[effect_empire_size_step_fascism]
+type    = "Empire_Size_Step"
+value   = 16
+reqs    =
+    { "type", "name", "range"
+      "Gov", "Fascism", "Player"
+    }
+
+[effect_corruption_fascism]
+type    = "Output_Waste"
+value   = 15
+reqs    =
+    { "type", "name", "range", "quiet"
+      "Gov", "Fascism", "Player", TRUE
+      "OutputType", "Trade", "Local", FALSE
+    }
+
+[effect_corruption_distance_fascism]
+type    = "Output_Waste_By_Distance"
+value   = 20
+reqs    =
+    { "type", "name", "range", "quiet"
+      "Gov", "Fascism", "Player", TRUE
+      "OutputType", "Shield", "Local", FALSE
+    }
+
+[effect_upkeep_free_units_fascism]
+type    = "Unit_Upkeep_Free_Per_City"
+value   = 3
+reqs    =
+    { "type", "name", "range", "quiet"
+      "Gov", "Fascism", "Player", TRUE
+      "OutputType", "Shield", "Local", FALSE
+    }
+
+[effect_martial_law_fascism]
+type    = "Make_Content_Mil"
+value   = 3
+reqs    =
+    { "type", "name", "range"
+      "Gov", "Fascism", "Player"
+    }
+
+[effect_industry_fascism]
+type    = "Output_Bonus"
+value   = 25
+reqs    =
+    { "type", "name", "range"
+      "Gov", "Fascism", "Player"
+      "OutputType", "Shield", "Local"
+    }
+
+[effect_science_penalty_fascism]
+type    = "Output_Bonus"
+value   = -25
+reqs    =
+    { "type", "name", "range"
+      "Gov", "Fascism", "Player"
+      "OutputType", "Science", "Local"
+    }
+
+; --- Corporate Republic ---
+[effect_max_rates_corporate]
+type    = "Max_Rates"
+value   = 80
+reqs    =
+    { "type", "name", "range"
+      "Gov", "Corporate Republic", "Player"
+    }
+
+[effect_empire_size_base_corporate]
+type    = "Empire_Size_Base"
+value   = 20
+reqs    =
+    { "type", "name", "range"
+      "Gov", "Corporate Republic", "Player"
+    }
+
+[effect_empire_size_step_corporate]
+type    = "Empire_Size_Step"
+value   = 20
+reqs    =
+    { "type", "name", "range"
+      "Gov", "Corporate Republic", "Player"
+    }
+
+[effect_tax_bonus_corporate]
+type    = "Output_Bonus"
+value   = 25
+reqs    =
+    { "type", "name", "range"
+      "Gov", "Corporate Republic", "Player"
+      "OutputType", "Gold", "Local"
+    }
+
+[effect_gov_tile_bonus_corporate]
+type    = "Output_Inc_Tile"
+value   = 1
+reqs    =
+    { "type", "name", "range", "present", "quiet"
+      "Gov", "Corporate Republic", "Player", TRUE, TRUE
+      "OutputType", "Trade", "Local", TRUE, FALSE
+    }
+
+[effect_corruption_corporate]
+type    = "Output_Waste"
+value   = 10
+reqs    =
+    { "type", "name", "range", "quiet"
+      "Gov", "Corporate Republic", "Player", TRUE
+      "OutputType", "Trade", "Local", FALSE
+    }
+
+[effect_corruption_distance_corporate]
+type    = "Output_Waste_By_Distance"
+value   = 30
+reqs    =
+    { "type", "name", "range", "quiet"
+      "Gov", "Corporate Republic", "Player", TRUE
+      "OutputType", "Trade", "Local", FALSE
+    }
+
+; (Corporate Republic deliberately has NO Unit_Upkeep_Free_Per_City effect —
+;  with no global free-upkeep default, that means zero free military support:
+;  mercenary forces must be paid in full.)
+
 [effect_hydro_plant]
 type    = "Output_Bonus"
 value   = 25

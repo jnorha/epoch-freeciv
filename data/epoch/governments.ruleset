@@ -481,6 +481,50 @@ Synthesis fuses human governance with recovered Soma cognition into a single\
  the messier freedoms of older orders.\
 ")
 
+[government_fascism]
+
+name        = _("Fascism")
+reqs = { "type", "name", "range"
+         "tech", "Conscription", "Player"
+       }
+graphic     = "gov.communism"
+graphic_alt = "gov.despotism"
+sound       = "g_communism"
+sound_alt   = "g_generic"
+sound_alt2  = "-"
+
+ruler_male_title = _("Chancellor %s")
+ruler_female_title = _("?female:Chancellor %s")
+
+helptext = _("\
+Fascism forges the state into a single war machine. Its factories run hot\
+ and its armies march free, kept loyal by martial law -- but its contempt\
+ for open inquiry throttles science, and distance still breeds graft. A\
+ government for conquest, not for prosperity.\
+")
+
+[government_corporate]
+
+name        = _("Corporate Republic")
+reqs = { "type", "name", "range"
+         "tech", "The Corporation", "Player"
+       }
+graphic     = "gov.democracy"
+graphic_alt = "gov.federation"
+sound       = "g_democracy"
+sound_alt   = "g_generic"
+sound_alt2  = "-"
+
+ruler_male_title = _("Director %s")
+ruler_female_title = _("?female:Director %s")
+
+helptext = _("\
+The Corporate Republic runs the state as an enterprise: commerce is king\
+ and the treasury swells with a hefty tax bonus and rich trade. But its\
+ mercenary forces demand hard coin -- there is no free military support --\
+ and executive greed leaves corruption that grows with distance.\
+")
+
 ; /* <-- avoid gettext warnings
 ;
 ; Multipliers (aka policies)
