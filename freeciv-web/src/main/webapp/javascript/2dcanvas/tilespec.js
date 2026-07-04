@@ -143,16 +143,29 @@ function tileset_extra_graphic_tag(extra)
 **************************************************************************/
 function tileset_unit_type_graphic_tag(utype)
 {
+  var base = null;
   if (tileset_has_tag(utype['graphic_str'] + "_Idle")) {
-    return utype['graphic_str'] + "_Idle";
+    base = utype['graphic_str'] + "_Idle";
+  } else if (tileset_has_tag(utype['graphic_alt'] + "_Idle")) {
+    base = utype['graphic_alt'] + "_Idle";
   }
 
-  if (tileset_has_tag(utype['graphic_alt'] + "_Idle")) {
-    return utype['graphic_alt'] + "_Idle";
+  if (base == null) {
+    console.log("No graphic for unit " + utype['name']);
+    return null;
   }
 
-  console.log("No graphic for unit " + utype['name']);
-  return null;
+  /* Epoch: multi-frame idle animation. When numbered frame tags exist
+     (<base>_0, <base>_1, ...) cycle them at ~2 Hz — the 2dcanvas map redraws
+     continuously (update_map_canvas_check), so a time-derived index is enough.
+     Units without frame tags keep the static <base> sprite. */
+  if (tileset_has_tag(base + "_0")) {
+    var frames = 1;
+    while (frames < 8 && tileset_has_tag(base + "_" + frames)) frames++;
+    return base + "_" + (Math.floor(Date.now() / 500) % frames);
+  }
+
+  return base;
 }
 
 /**************************************************************************
@@ -674,10 +687,24 @@ function check_sprite_type(sprite_type)
 function fill_unit_sprite_array(punit, stacked, backdrop)
 {
   var unit_offset = get_unit_anim_offset(punit);
+  var utag = tileset_unit_graphic_tag(punit);
+  var uox = unit_offset['x'] + unit_offset_x;
+  var uoy = unit_offset['y'] - unit_offset_y;
+  /* Epoch: the global unit offsets assume amplio2's stock 64x48 unit cell.
+     Larger epoch cells (e.g. 96x80) center horizontally (keeping amplio2's
+     +3px bias) and keep the stock bottom baseline, so oversized sprites sit
+     on the tile exactly like stock ones. */
+  if (utag != null && tileset[utag] != null
+      && (tileset[utag][2] != 64 || tileset[utag][3] != 48)) {
+    var utw = tileset[utag][2], uth = tileset[utag][3];
+    uox = unit_offset['x'] + Math.floor((tileset_tile_width - utw) / 2)
+          + (unit_offset_x - Math.floor((tileset_tile_width - 64) / 2));
+    uoy = unit_offset['y'] + (tileset_tile_height - unit_offset_y) - uth;
+  }
   var result = [ get_unit_nation_flag_sprite(punit),
-           {"key" : tileset_unit_graphic_tag(punit),
-            "offset_x": unit_offset['x'] + unit_offset_x,
-	    "offset_y" : unit_offset['y'] - unit_offset_y} ];
+           {"key" : utag,
+            "offset_x": uox,
+	    "offset_y" : uoy} ];
   var activities = get_unit_activity_sprite(punit);
   if (activities != null) {
     activities['offset_x'] = activities['offset_x'] + unit_offset['x'];

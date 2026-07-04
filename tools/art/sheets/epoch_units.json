@@ -1,0 +1,15 @@
+{
+  "cell": "96x80",
+  "gfx": "amplio2/epoch_units",
+  "out": "../../../tileset/epoch/web/epoch_units",
+  "columns": 4,
+  "sprites": [
+    { "tag": "u.undersea_worker_Idle", "file": "../../../tileset/epoch/src/units/undersea_worker_96.png" },
+    { "tag": "u.undersea_worker_Idle_0", "file": "../../../tileset/epoch/src/units/undersea_worker_96.png" },
+    { "tag": "u.undersea_worker_Idle_1", "file": "../../../tileset/epoch/src/units/undersea_worker_f1_96.png" },
+    { "tag": "u.abyssal_founder_Idle", "file": "../../../tileset/epoch/src/units/abyssal_founder_96.png" },
+    { "tag": "u.weapon_platform_Idle", "file": "../../../tileset/epoch/src/units/weapon_platform_96.png" },
+    { "tag": "u.weapon_platform_Idle_0", "file": "../../../tileset/epoch/src/units/weapon_platform_96.png" },
+    { "tag": "u.weapon_platform_Idle_1", "file": "../../../tileset/epoch/src/units/weapon_platform_f1_96.png" }
+  ]
+}

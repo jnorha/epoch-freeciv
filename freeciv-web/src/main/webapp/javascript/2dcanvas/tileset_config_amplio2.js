@@ -29,7 +29,7 @@ var tileset_options = "+tilespec4+2007.Oct.26";
 var tileset_name = "amplio2";
 var priority = 20;
 
-var tileset_image_count = 3;
+var tileset_image_count = 4; // was 3; epoch sprite sheets push packing onto a 4th page
 
 var normal_tile_width  = 96;
 var normal_tile_height = 48;

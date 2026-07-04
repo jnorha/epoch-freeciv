@@ -649,8 +649,8 @@ reqs	=
       "Tech", "Fusion Lattices", "Player"
       "TerrainClass", "Oceanic", "Adjacent"
     }
-graphic         = "b.offshore_platform"
-graphic_alt     = "-"
+graphic         = "b.abyssal_foundry"
+graphic_alt     = "b.offshore_platform"
 graphic_alt2    = "-"
 obsolete_by	=
     { "type", "name", "range"
@@ -2438,8 +2438,8 @@ reqs	=
       "Tech", "Living Architecture", "Player"
       "Terrain", "Forest", "Adjacent"
     }
-graphic         = "b.hanging_gardens"
-graphic_alt     = "-"
+graphic         = "b.world_tree_spire"
+graphic_alt     = "b.hanging_gardens"
 graphic_alt2    = "-"
 obsolete_by	=
     { "type", "name", "range"

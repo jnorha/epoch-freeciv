@@ -1,0 +1,10 @@
+{
+  "cell": "128x128",
+  "gfx": "amplio2/epoch_buildings",
+  "out": "../../../tileset/epoch/web/epoch_buildings",
+  "columns": 4,
+  "sprites": [
+    { "tag": "b.abyssal_foundry", "file": "../../../tileset/epoch/src/buildings/abyssal_foundry_128.png" },
+    { "tag": "b.world_tree_spire", "file": "../../../tileset/epoch/src/buildings/world_tree_spire_128.png" }
+  ]
+}

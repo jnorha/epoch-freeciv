@@ -125,6 +125,7 @@ const arg = (n: string) => {
 
 const assetId = arg("asset");
 const rawPrompt = arg("prompt");
+const imgArg = arg("img"); // NB2 edit mode: reference image whose content is preserved
 const rawOut = arg("out");
 const modelArg = (arg("model") ?? "nano-banana-2").toLowerCase();
 const anchorArg = arg("anchor") as AnchorName | undefined;
@@ -154,6 +155,29 @@ function toAspect(s: string): string {
 function toFluxSize(s: string): unknown {
   if (/^\d+x\d+$/.test(s)) { const [w, h] = s.split("x").map(Number); return { width: w, height: h }; }
   return s;
+}
+
+async function uploadLocalImage(filePath: string): Promise<string> {
+  const abs = path.isAbsolute(filePath) ? filePath : path.join(process.cwd(), filePath);
+  const buf = fs.readFileSync(abs);
+  const blob = new Blob([buf], { type: "image/png" });
+  return await fal.storage.upload(blob as File);
+}
+
+/** NB2 edit: keep the reference image's content, apply only the prompted change.
+ *  Used for animation frames ("identical sprite, only the lights differ"). */
+async function genNB2Edit(prompt: string, imgPath: string, out: string): Promise<void> {
+  console.log(`Nano Banana 2 EDIT (${path.basename(imgPath)}): ${prompt.slice(0, 80)}…`);
+  const url = await uploadLocalImage(imgPath);
+  const result = (await fal.subscribe("fal-ai/nano-banana-2/edit", {
+    input: {
+      prompt, image_urls: [url], resolution: resolutionArg, num_images: numArg,
+      thinking_level: thinkingArg, safety_tolerance: "6",
+      ...(seedArg !== undefined && { seed: seedArg }),
+    },
+    logs: false,
+  })) as { data: { images: { url: string; width: number; height: number }[] } };
+  await writeAll(result.data.images, out);
 }
 
 async function genNB2(prompt: string, system: string, aspect: string, out: string): Promise<void> {
@@ -209,8 +233,10 @@ async function main(): Promise<void> {
     if (!rawOut) { console.error("--out <path> required in raw mode"); process.exit(1); }
     const anchor = anchorArg ?? "concept";
     system = ANCHOR[anchor];
-    // In concept/raw mode the anchor is prepended to the prompt (Flux has no system prompt).
-    prompt = anchor === "concept" ? `${ANCHOR.concept} ${rawPrompt}` : rawPrompt;
+    // In concept/raw mode the anchor is prepended to the prompt (Flux has no system
+    // prompt). Edit mode (--img) sends the prompt untouched — the instruction IS the edit.
+    prompt = imgArg ? rawPrompt!
+      : anchor === "concept" ? `${ANCHOR.concept} ${rawPrompt}` : rawPrompt!;
     defaultSize = anchor === "concept" ? "landscape_16_9" : "1:1";
     out = path.isAbsolute(rawOut) ? rawOut : path.join(process.cwd(), rawOut);
   } else {
@@ -220,7 +246,8 @@ async function main(): Promise<void> {
 
   fs.mkdirSync(path.dirname(out), { recursive: true });
   const size = sizeArg ?? defaultSize;
-  if (modelArg === "nano-banana-2") await genNB2(prompt, system, toAspect(size), out);
+  if (imgArg) await genNB2Edit(prompt, imgArg, out);
+  else if (modelArg === "nano-banana-2") await genNB2(prompt, system, toAspect(size), out);
   else await genFlux(prompt, size, out);
 }
 

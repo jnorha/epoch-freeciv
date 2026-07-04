@@ -541,8 +541,8 @@ reqs          =
     "Tech", "Abyssal Engineering", "Player"
   }
 obsolete_by   = "None"
-graphic       = "u.caravel"
-graphic_alt   = "u.transport"
+graphic       = "u.abyssal_founder"
+graphic_alt   = "u.caravel"
 sound_move    = "m_settlers"
 sound_move_alt = "m_generic"
 sound_fight   = "f_settlers"
@@ -584,7 +584,7 @@ reqs          =
     "Tech", "Abyssal Engineering", "Player"
   }
 obsolete_by   = "None"
-graphic       = "u.workers"
+graphic       = "u.undersea_worker"
 graphic_alt   = "u.engineers"
 sound_move    = "m_generic"
 sound_move_alt = "m_generic"
@@ -3333,8 +3333,8 @@ reqs          =
     "Tech", "Orbital Ordnance", "Player"
   }
 obsolete_by   = "None"
-graphic       = "u.howitzer"
-graphic_alt   = "u.artillery"
+graphic       = "u.weapon_platform"
+graphic_alt   = "u.howitzer"
 sound_move    = "m_generic"
 sound_move_alt = "m_generic"
 sound_fight   = "f_generic"

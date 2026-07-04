@@ -6,7 +6,9 @@
   "description": "Epoch art-generation pipeline (fal.ai: Flux.1-schnell + Nano Banana 2) + sprite post-processing.",
   "scripts": {
     "gen": "node --env-file=.env --import tsx gen.ts",
-    "process": "tsx process_sprite.ts"
+    "process": "tsx process_sprite.ts",
+    "sheet": "tsx make_sheet.ts",
+    "preview": "tsx preview_sheet.ts"
   },
   "dependencies": {
     "@fal-ai/client": "^1.10.1"

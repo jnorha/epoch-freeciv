@@ -296,6 +296,15 @@ cd "${basedir}"/scripts/migration
 mig_scripts=([0-9]*)
 echo "${mig_scripts[-1]}" > checkpoint
 
+# Epoch: overlay our tileset sprite sheets/specs into the freeciv data dir so
+# freeciv-img-extract packs them into the amplio2 web atlas (spec list lives in
+# scripts/freeciv-img-extract/img-extract.py; sources in tileset/epoch/web/).
+if [ -d "${basedir}/tileset/epoch/web" ]; then
+  cp -v "${basedir}"/tileset/epoch/web/epoch_*.{spec,png} \
+    "${basedir}/freeciv/freeciv/data/amplio2/" || \
+    handle_error 6 "Failed to overlay epoch tileset sprites"
+fi
+
 mkdir -p "${basedir}/freeciv-web/src/derived/webapp" && \
   "${basedir}"/scripts/sync-js-hand.sh \
   -b "${basedir}" \

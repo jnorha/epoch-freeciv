@@ -46,8 +46,36 @@ npm run process -- --in ../../tileset/epoch/src/units/undersea_worker_nb2.png \
 ```
 
 Steps (each opt-in): `--remove-bg [tol]` · `--trim` · `--size WxH` / `--scale N` ·
-`--method box|nearest` · `--despeckle [N]` · `--pad WxH`. Masters (`*_nb2.png`) are kept next
-to the processed sprite — reprocess, don't regenerate.
+`--method box|nearest` · `--despeckle [N]` · `--pad WxH` · `--contrast N` · `--outline`.
+Masters (`*_nb2.png`) are kept next to the processed sprite — reprocess, don't regenerate.
+
+## Readability gate (MANDATORY before a sprite enters a sheet)
+
+```bash
+npm run preview -- --sprite ../../tileset/epoch/src/units/undersea_worker_96.png
+```
+
+Writes `<sprite>_preview.png`: the sprite at **native size** on real grass + deep-ocean
+panels (1× and 3×). Eyeball the 1× row — if the silhouette doesn't read there, it will not
+read on the map. Fix by regenerating with bolder prompts (below), or add `--outline` /
+`--contrast 12` in processing. No sprite ships on vibes; it ships on this sheet.
+
+**Authoring standard (target cells: units 96×80, buildings 128×128):**
+- Prompt for **bold silhouette, high contrast, minimal fine detail** — the anchor prompts
+  in `gen.ts` cover the flat background; add subject phrasing like "chunky readable
+  shapes" for units that gate poorly.
+- One subject, centered; no ground shadow (the map tile provides grounding).
+- Team/palette: keep a strong hue identity per unit — it's what survives 96px.
+
+## Sheets → game (`make_sheet.ts` + `refresh_tileset.sh`)
+
+Sprites enter the game via sheet manifests (`sheets/*.json`) → `npm run sheet -- --manifest
+sheets/epoch_units.json` → `tileset/epoch/web/epoch_*.{png,spec}`. Those are packed into the
+amplio2 web atlas by `scripts/freeciv-img-extract` (spec list includes them; `install.sh`
+overlays them into the freeciv data dir at image build). For a running container, skip the
+rebuild: `./refresh_tileset.sh` re-runs the extractor in-container and deploys atlas + spec +
+config; then hard-refresh the browser. Unit tags are `u.<name>_Idle` (+`_Idle_0/_1/...` for
+animation frames); building tags are plain `b.<name>`.
 
 ## Layout
 
