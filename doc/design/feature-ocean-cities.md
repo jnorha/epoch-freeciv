@@ -124,6 +124,25 @@ structurally impossible.
 `whole_map_iterate()`, `tile:square_iterate(r)`, `tile.terrain:rule_name()` all work as written;
 `unit:perform_action(action, tile)` is the tile-target action path (`find.action("Found City")`).
 
+### 5b. Growth viability — the shipped Harbor solves it (✅ 2026-07-03)
+The §3 "will they starve / can they grow" concern is **resolved by an existing building, no new
+content required.** The shipped **Harbor** (`[building_harbor]`, rule_name `"Harbour"`) gives *+1
+food on every Ocean/Deep-Ocean tile* and needs only `Tech Seafaring` + `TerrainFlag Sea Adjacent`
+— which an undersea shelf city (ringed by ocean) satisfies, so it can build one in normal play.
+
+**A/B growth spike — CONCLUSIVE:** two coastal shelf cities founded side by side, both bumped to
+size 2; one given a Harbor, one not. Over 36 turns:
+- **With Harbor:** grew 3 → 4 (t15) → **5** (t20), then held at 5.
+- **Without Harbor:** stalled at **3** for the entire run.
+
+So a Harbor turns a subsistence shelf city into a growing one (+67% size here). It **plateaus at
+~5** — the pure-ocean food equilibrium of a Harbor-only city — which is exactly the ceiling the
+deferred **Bio-Farm / Supermarket / Sewer** tier (`feature-sea-improvements.md`) exists to push
+past. Basic undersea-city viability is therefore a solved problem on shipped mechanics; the
+undersea food-improvement extras are a *late-game growth* feature, not a *viability* prerequisite.
+(tolua: `edit.create_building(city, impr)`, `city:has_building(impr)`, `edit.change_city_size`;
+`find.building_type` matches the **rule_name** — use `"Harbour"`, not `"Harbor"`.)
+
 ## 6. Open questions
 - **One buildable terrain or a distinct "Continental Shelf" terrain?** Recommend reusing shallow
   `Ocean` (fewer terrains, less art) unless item 1.4's resource design wants a separate shelf type.
