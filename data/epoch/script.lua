@@ -413,7 +413,7 @@ EPOCH_TECH_AGE = {
   ["Navigation"]=2, ["Physics"]=2, ["Magnetism"]=2, ["Theory of Gravity"]=2,
   ["Leadership"]=2, ["Metallurgy"]=2, ["Chemistry"]=2, ["Economics"]=2,
   ["Democracy"]=2,
-  -- Age III — Dynamo (44 existing; Networked Computing added in a later slice)
+  -- Age III — Dynamo (44 existing + Networked Computing, the Slice 1 bridge)
   ["Steam Engine"]=3, ["Railroad"]=3, ["Industrialization"]=3,
   ["The Corporation"]=3, ["Sanitation"]=3, ["Explosives"]=3, ["Refining"]=3,
   ["Electricity"]=3, ["Engineering"]=3, ["Steel"]=3, ["Conscription"]=3,
@@ -426,7 +426,11 @@ EPOCH_TECH_AGE = {
   ["Computers"]=3, ["Rocketry"]=3, ["Space Flight"]=3, ["Laser"]=3,
   ["Superconductors"]=3, ["Robotics"]=3, ["Plastics"]=3, ["Stealth"]=3,
   ["Recycling"]=3, ["Environmentalism"]=3, ["Genetic Engineering"]=3,
-  ["Fusion Power"]=3,
+  ["Fusion Power"]=3, ["Networked Computing"]=3,
+  -- Age IV — Helix (Slice 1 skeleton: anchor + one leaf; full 13 in Slice 2)
+  ["Genome Cartography"]=4, ["Cellular Rewriting"]=4,
+  -- Age V — Lattice (Slice 1 skeleton: anchor + one leaf; full 14 in Slice 3)
+  ["Molecular Assembly"]=5, ["Metamaterials"]=5,
 }
 
 -- Resolved lookups, built lazily (find.tech_type is safe once rules are loaded).

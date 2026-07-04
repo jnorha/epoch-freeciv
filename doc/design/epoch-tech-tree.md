@@ -145,7 +145,18 @@ Five signature throughlines, each starting at an Ember/Compass tech and ending a
 Smoke-test each slice against `scripts/epoch-smoke-test.sh` (Phase 3 discipline). First slice proves the five-age arc transitions end-to-end, not full content.
 
 - **Slice 0 — Detection harness on the existing tree (MVP backbone).** Before any new tech: replace the draft's `min_tech` counts with the tech→age lookup for the 87 existing techs (ages I–III populated; IV/V empty). Wire `tech_researched` + `turn_begin` rescan. Wire five tech classes with placeholder `cost_pct`. **Test:** autogame fires era_transition I→II→III at sane turns; telemetry logs `{from,to,trigger_tech}`; zero Lua errors.
-- **Slice 1 — Anchors + skeletal future ages.** Add the 2 anchors + Networked Computing + one leaf per future age; set `root_req`. **Test:** AI research-completes into IV/V; era fires; grant a future leaf to a player lacking the anchor via Lua → assert acquisition denied (proves the hard gate — the single most important correctness property).
+- **Slice 1 — Anchors + skeletal future ages. ✅ DONE (2026-07-03).** Added the 2 anchors
+  (Genome Cartography IV, Molecular Assembly V) + Networked Computing + one leaf per future age
+  (Cellular Rewriting IV, Metamaterials V) with `root_req`; extended `EPOCH_TECH_AGE`.
+  **Verified in-container:** era detection fires III→IV→V on the new anchors
+  (`era_transition … to=4 (helix) … to=5 (lattice)`); the hard gate holds — a player holding
+  Metamaterials' `req1`+`req2` but not the anchor has `can_research(Metamaterials)==false`
+  (inherited `root_req=Genome Cartography` blocks acquisition by any means), flipping to `true`
+  the moment the anchor is granted. Key API finding: `edit.give_tech` **force-grants** (bypasses
+  `root_req`, the "scripting" special case) so it is NOT a denial-test vector; `player:can_research`
+  (= `research_invention_state == TECH_PREREQS_KNOWN`) is the correct probe as it honors `root_req`.
+  *Skeletal prereqs* (Molecular Assembly ← Cellular Rewriting only, etc.) get replaced by the full
+  graph in Slices 2–3.
 - **Slice 2 — Full Helix (13).** Real prereq pairs. Undersea + cyborg/AI branch points exist and gate. Unblocks 2.1/2.2 and Helix units (1.2).
 - **Slice 3 — Full Lattice (14).** Tree complete at 115. Orbital (3.2), solarpunk PW (3.3), victory hooks (3.4) gated. Long autogame (200+ turns): every era transition fires once, monotonically.
 - **Slice 4 — Tuning + cut/merge.** Tune the five `cost_pct` multipliers to hit §1 span targets; execute §3 cut/merge with 1.2 unit rehoming (move units once). Surface multipliers in `EPOCH_CONFIG`.

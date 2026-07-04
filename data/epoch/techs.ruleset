@@ -864,3 +864,68 @@ req2     = "None"
 flags    = ""
 graphic     = "a.writing"
 graphic_alt = "-"
+
+; ==========================================================================
+; Epoch Slice 1 — future-age skeleton (2 anchors + Networked Computing + one
+; leaf per future age). Establishes the Helix (IV) and Lattice (V) branches
+; and the root_req hard gate. Prereqs are Slice-1 skeletal; Slices 2-3 replace
+; the placeholder chains (e.g. Molecular Assembly's real reqs are Cultured
+; Materials + Synthetic Cognition) with the full 28-tech graph from
+; doc/design/epoch-tech-tree.md. Graphics reuse near existing icons until the
+; art pass. Keep the age assignments in script.lua's EPOCH_TECH_AGE in sync.
+; ==========================================================================
+
+; Dynamo (III) gap-fill — bridge into the future ages.
+[advance_networked_computing]
+name     = _("Networked Computing")
+req1     = "Computers"
+req2     = "Mass Production"
+flags    = ""
+graphic     = "a.computers"
+graphic_alt = "-"
+
+; Helix (IV) ANCHOR. Researchable via its prereqs (the doorway into age IV);
+; it is the root_req carried by the rest of the Helix+Lattice subtree.
+[advance_genome_cartography]
+name     = _("Genome Cartography")
+req1     = "Genetic Engineering"
+req2     = "Networked Computing"
+flags    = ""
+graphic     = "a.genetic_engineering"
+graphic_alt = "-"
+
+; Helix (IV) leaf. root_req = itself's parent anchor: this + everything that
+; depends on it can only be acquired (by ANY means: research/theft/trade/free)
+; once Genome Cartography is known. Seeds root_req inheritance into Lattice.
+[advance_cellular_rewriting]
+name     = _("Cellular Rewriting")
+req1     = "Genome Cartography"
+req2     = "Medicine"
+root_req = "Genome Cartography"
+flags    = ""
+graphic     = "a.genetic_engineering"
+graphic_alt = "-"
+
+; Lattice (V) ANCHOR. Skeletal prereq (real: Cultured Materials + Synthetic
+; Cognition). Descends from Cellular Rewriting, so it INHERITS root_req =
+; Genome Cartography automatically — no age-V tech without age IV's anchor.
+[advance_molecular_assembly]
+name     = _("Molecular Assembly")
+req1     = "Cellular Rewriting"
+req2     = "None"
+flags    = ""
+graphic     = "a.superconductors"
+graphic_alt = "-"
+
+; Lattice (V) leaf and the hard-gate test target: req1/req2 (Molecular Assembly
+; + Superconductors) are both non-anchor techs, so the ONLY thing standing
+; between a player and this tech (once those are held) is the INHERITED
+; root_req = Genome Cartography. root_req here adds the age-V anchor gate too.
+[advance_metamaterials]
+name     = _("Metamaterials")
+req1     = "Molecular Assembly"
+req2     = "Superconductors"
+root_req = "Molecular Assembly"
+flags    = ""
+graphic     = "a.superconductors"
+graphic_alt = "-"
