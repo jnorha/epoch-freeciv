@@ -1121,7 +1121,7 @@ reqs          =
   { "type", "name", "range"
     "Tech", "Labor Union", "Player"
   }
-obsolete_by   = "None"
+obsolete_by   = "Cyborg Infantry"
 graphic       = "u.mech_inf"
 graphic_alt   = "-"
 sound_move    = "m_mech_inf"
@@ -1415,7 +1415,7 @@ reqs          =
   { "type", "name", "range"
     "Tech", "Mobile Warfare", "Player"
   }
-obsolete_by   = "None"
+obsolete_by   = "War-Walker"
 graphic       = "u.armor"
 graphic_alt   = "-"
 sound_move    = "m_armor"
@@ -2126,7 +2126,7 @@ reqs          =
   { "type", "name", "range"
     "Tech", "Mass Production", "Player"
   }
-obsolete_by   = "None"
+obsolete_by   = "Plasma Cruiser"
 graphic       = "u.battleship"
 graphic_alt   = "-"
 sound_move    = "m_battleship"
@@ -2162,7 +2162,7 @@ reqs          =
   { "type", "name", "range"
     "Tech", "Combustion", "Player"
   }
-obsolete_by   = "None"
+obsolete_by   = "Pressure Sub"
 graphic       = "u.submarine"
 graphic_alt   = "-"
 sound_move    = "m_submarine"
@@ -2887,4 +2887,341 @@ flags         = "NoBuild", "Cant_Fortify", "Unbribable",
 roles         = ""
 helptext      = _("\
 Storms move randomly at seas.\
+")
+
+; ==========================================================================
+; Epoch item 1.2 — era unit rosters: the Helix (IV) + Lattice (V) COMBAT
+; roster. Each unit is Tech-gated on a new far-future advance from Slices
+; 1-3. Stats are a first pass, scaled a notch above the Dynamo top tier
+; (Mech Inf a6/d6, Armor a10, Battleship a12/d12, Stealth Fighter a8/d8);
+; balance tuning is a later pass. Graphics/sounds reuse existing assets as
+; placeholders until the §1a sprite pass. Deferred to their own items: the
+; undersea colonizer/founder (2.1, needs ocean-city enablement) and the true
+; all-terrain Orbital unit class + weapon platforms (3.2).
+; ==========================================================================
+
+; -- Helix Age (IV) --
+
+[unit_cyborg_infantry]
+name          = _("Cyborg Infantry")
+class         = "Big Land"
+reqs          =
+  { "type", "name", "range"
+    "Tech", "Cybernetic Symbiosis", "Player"
+  }
+obsolete_by   = "None"
+graphic       = "u.mech_inf"
+graphic_alt   = "-"
+sound_move    = "m_generic"
+sound_move_alt = "m_generic"
+sound_fight   = "f_generic"
+sound_fight_alt = "f_generic"
+build_cost    = 90
+pop_cost      = 0
+attack        = 8
+defense       = 10
+hitpoints     = 40
+firepower     = 1
+move_rate     = 3
+vision_radius_sq = 2
+transport_cap = 0
+fuel          = 0
+uk_happy      = 1
+uk_shield     = 1
+uk_food       = 0
+uk_gold       = 0
+tp_defense    = "Alight"
+flags         = ""
+roles         = "DefendGood"
+helptext      = _("\
+Cybernetically augmented infantry -- the Helix age's frontline defender, \
+succeeding the Mechanized Infantry.\
+")
+
+[unit_chimera_soldier]
+name          = _("Chimera Soldier")
+class         = "Land"
+reqs          =
+  { "type", "name", "range"
+    "Tech", "Cellular Rewriting", "Player"
+  }
+obsolete_by   = "None"
+graphic       = "u.marines"
+graphic_alt   = "-"
+sound_move    = "m_generic"
+sound_move_alt = "m_generic"
+sound_fight   = "f_generic"
+sound_fight_alt = "f_generic"
+build_cost    = 75
+pop_cost      = 0
+attack        = 9
+defense       = 6
+hitpoints     = 30
+firepower     = 1
+move_rate     = 2
+vision_radius_sq = 2
+transport_cap = 0
+fuel          = 0
+uk_happy      = 1
+uk_shield     = 1
+uk_food       = 0
+uk_gold       = 0
+tp_defense    = "Alight"
+flags         = "Marines"
+roles         = "Hunter"
+helptext      = _("\
+Gene-forged assault troops. Amphibious -- they can attack directly from \
+ships onto shore.\
+")
+
+[unit_combat_drone]
+name          = _("Combat Drone")
+class         = "Helicopter"
+reqs          =
+  { "type", "name", "range"
+    "Tech", "Machine Cognition", "Player"
+  }
+obsolete_by   = "None"
+graphic       = "u.helicopter"
+graphic_alt   = "-"
+sound_move    = "m_generic"
+sound_move_alt = "m_generic"
+sound_fight   = "f_generic"
+sound_fight_alt = "f_generic"
+build_cost    = 75
+pop_cost      = 0
+attack        = 9
+defense       = 5
+hitpoints     = 25
+firepower     = 1
+move_rate     = 8
+vision_radius_sq = 3
+transport_cap = 0
+fuel          = 0
+uk_happy      = 1
+uk_shield     = 1
+uk_food       = 0
+uk_gold       = 0
+tp_defense    = "Alight"
+flags         = "AirAttacker", "HasNoZOC"
+roles         = "Hunter"
+helptext      = _("\
+An autonomous rotor drone directed by learning machines -- fast, cheap to \
+field, and deadly to ground units.\
+")
+
+[unit_pressure_sub]
+name          = _("Pressure Sub")
+class         = "Sea"
+reqs          =
+  { "type", "name", "range"
+    "Tech", "Pressure Ecology", "Player"
+  }
+obsolete_by   = "None"
+graphic       = "u.submarine"
+graphic_alt   = "-"
+sound_move    = "m_generic"
+sound_move_alt = "m_generic"
+sound_fight   = "f_generic"
+sound_fight_alt = "f_generic"
+build_cost    = 95
+pop_cost      = 0
+attack        = 15
+defense       = 8
+hitpoints     = 30
+firepower     = 1
+move_rate     = 6
+vision_radius_sq = 2
+transport_cap = 0
+fuel          = 0
+uk_happy      = 1
+uk_shield     = 1
+uk_food       = 0
+uk_gold       = 0
+tp_defense    = "Alight"
+flags         = "BadCityDefender", "Only_Native_Attack", "Submarine"
+roles         = "Hunter"
+helptext      = _("\
+A deep-pressure submarine hull grown from engineered materials -- the \
+Helix successor to the Submarine, stealthy and hard-hitting.\
+")
+
+; -- Lattice Age (V) --
+
+[unit_war_walker]
+name          = _("War-Walker")
+class         = "Big Land"
+reqs          =
+  { "type", "name", "range"
+    "Tech", "Autonomous Legions", "Player"
+  }
+obsolete_by   = "None"
+graphic       = "u.armor"
+graphic_alt   = "-"
+sound_move    = "m_generic"
+sound_move_alt = "m_generic"
+sound_fight   = "f_generic"
+sound_fight_alt = "f_generic"
+build_cost    = 140
+pop_cost      = 0
+attack        = 18
+defense       = 14
+hitpoints     = 60
+firepower     = 1
+move_rate     = 3
+vision_radius_sq = 2
+transport_cap = 0
+fuel          = 0
+uk_happy      = 1
+uk_shield     = 1
+uk_food       = 0
+uk_gold       = 0
+tp_defense    = "Alight"
+flags         = ""
+roles         = "Hunter"
+helptext      = _("\
+A towering autonomous walker -- the apex land unit of the Lattice age.\
+")
+
+[unit_plasma_trooper]
+name          = _("Plasma Trooper")
+class         = "Land"
+reqs          =
+  { "type", "name", "range"
+    "Tech", "Plasma Containment", "Player"
+  }
+obsolete_by   = "None"
+graphic       = "u.alpine_troops"
+graphic_alt   = "-"
+sound_move    = "m_generic"
+sound_move_alt = "m_generic"
+sound_fight   = "f_generic"
+sound_fight_alt = "f_generic"
+build_cost    = 95
+pop_cost      = 0
+attack        = 13
+defense       = 11
+hitpoints     = 35
+firepower     = 1
+move_rate     = 2
+vision_radius_sq = 2
+transport_cap = 0
+fuel          = 0
+uk_happy      = 1
+uk_shield     = 1
+uk_food       = 0
+uk_gold       = 0
+tp_defense    = "Alight"
+flags         = ""
+roles         = "DefendGood"
+helptext      = _("\
+Infantry armed with contained-plasma weapons -- a versatile Lattice-age \
+line unit, strong on both attack and defense.\
+")
+
+[unit_synthetic_legion]
+name          = _("Synthetic Legion")
+class         = "Big Land"
+reqs          =
+  { "type", "name", "range"
+    "Tech", "Neural Uplink", "Player"
+  }
+obsolete_by   = "None"
+graphic       = "u.armor"
+graphic_alt   = "-"
+sound_move    = "m_generic"
+sound_move_alt = "m_generic"
+sound_fight   = "f_generic"
+sound_fight_alt = "f_generic"
+build_cost    = 110
+pop_cost      = 0
+attack        = 15
+defense       = 11
+hitpoints     = 45
+firepower     = 1
+move_rate     = 4
+vision_radius_sq = 2
+transport_cap = 0
+fuel          = 0
+uk_happy      = 0
+uk_shield     = 1
+uk_food       = 0
+uk_gold       = 0
+tp_defense    = "Alight"
+flags         = ""
+roles         = "Hunter"
+helptext      = _("\
+A network-directed formation of synthetic soldiers -- fast for its weight \
+and undemanding of its citizens (no unhappiness upkeep).\
+")
+
+[unit_plasma_cruiser]
+name          = _("Plasma Cruiser")
+class         = "Sea"
+reqs          =
+  { "type", "name", "range"
+    "Tech", "Fusion Lattices", "Player"
+  }
+obsolete_by   = "None"
+graphic       = "u.battleship"
+graphic_alt   = "-"
+sound_move    = "m_generic"
+sound_move_alt = "m_generic"
+sound_fight   = "f_generic"
+sound_fight_alt = "f_generic"
+build_cost    = 170
+pop_cost      = 0
+attack        = 18
+defense       = 16
+hitpoints     = 40
+firepower     = 1
+move_rate     = 5
+vision_radius_sq = 2
+transport_cap = 0
+fuel          = 0
+uk_happy      = 1
+uk_shield     = 1
+uk_food       = 0
+uk_gold       = 0
+tp_defense    = "Alight"
+flags         = "BadCityDefender"
+roles         = "Hunter"
+helptext      = _("\
+A fusion-powered capital ship -- the Lattice successor to the Battleship.\
+")
+
+[unit_space_plane]
+name          = _("Space Plane")
+class         = "Air"
+reqs          =
+  { "type", "name", "range"
+    "Tech", "Orbital Logistics", "Player"
+  }
+obsolete_by   = "None"
+graphic       = "u.stealth_fighter"
+graphic_alt   = "-"
+sound_move    = "m_generic"
+sound_move_alt = "m_generic"
+sound_fight   = "f_generic"
+sound_fight_alt = "f_generic"
+build_cost    = 110
+pop_cost      = 0
+attack        = 12
+defense       = 9
+hitpoints     = 30
+firepower     = 1
+move_rate     = 18
+vision_radius_sq = 3
+transport_cap = 0
+fuel          = 2
+uk_happy      = 1
+uk_shield     = 1
+uk_food       = 0
+uk_gold       = 0
+tp_defense    = "Alight"
+flags         = "AirAttacker", "HasNoZOC"
+roles         = "Hunter"
+helptext      = _("\
+A sub-orbital strike craft with tremendous range. (The true all-terrain \
+Orbital unit class and weapon platforms arrive with item 3.2.)\
 ")
