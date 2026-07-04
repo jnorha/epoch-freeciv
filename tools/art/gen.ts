@@ -230,6 +230,56 @@ const CATALOG: Record<string, Asset> = {
       "green, ceremonial and architectural",
     outDir: "../../tileset/epoch/src/buildings",
   },
+  // --- Future-age ordinary buildings ---
+  gene_clinic: {
+    anchor: "building",
+    subject:
+      "a gene-medicine clinic building, a sterile white and soft-green biotech pavilion of " +
+      "curved glass and chrome, a tall central atrium with a subtle double-helix DNA sculpture " +
+      "glowing pale green inside, clean medical architecture",
+    outDir: "../../tileset/epoch/src/buildings",
+  },
+  biosphere_dome: {
+    anchor: "building",
+    subject:
+      "a sealed solarpunk arcology dome building, a large glass geodesic dome densely packed " +
+      "with lush terraced greenery and small dwellings inside, teal glass panes and emerald " +
+      "foliage, brass geodesic framework, bold hemispherical silhouette",
+    outDir: "../../tileset/epoch/src/buildings",
+  },
+  cognition_hub: {
+    anchor: "building",
+    subject:
+      "a learning-machine research center building, a sleek angular data-center spire of " +
+      "stacked slate-grey server blocks with rows of glowing indigo and cyan processor cores, " +
+      "cooling fins and antenna crown, cold blue radiance",
+    outDir: "../../tileset/epoch/src/buildings",
+  },
+  nanofabricator: {
+    anchor: "building",
+    subject:
+      "a self-configuring molecular factory building, a chunky industrial fabricator block of " +
+      "steel-grey modular cells with articulated orange robotic assembly arms working on its " +
+      "open upper deck, amber hazard striping and warm furnace glow, squat mechanical silhouette",
+    outDir: "../../tileset/epoch/src/buildings",
+  },
+  living_arcology: {
+    anchor: "building",
+    subject:
+      "a grown self-repairing megastructure tower, an organic plant-like arcology of twisting " +
+      "living bark fused with warm-gold glass dwellings, leafy canopy terraces spiraling up its " +
+      "trunk, warm golden-green light, tall organic silhouette",
+    outDir: "../../tileset/epoch/src/buildings",
+    aspect: "3:4",
+  },
+  neural_exchange: {
+    anchor: "building",
+    subject:
+      "a mind-network hub building, a faceted crystalline tower like a grown amethyst shard " +
+      "cluster laced with glowing white filament connections between its spires, violet crystal " +
+      "and white light, elegant jagged silhouette",
+    outDir: "../../tileset/epoch/src/buildings",
+  },
   abyssal_archive: {
     anchor: "building",
     subject:

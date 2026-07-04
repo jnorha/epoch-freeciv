@@ -12,6 +12,12 @@
     { "tag": "b.ascendant_nexus", "file": "../../../tileset/epoch/src/buildings/ascendant_nexus_128.png" },
     { "tag": "b.skyhook_terminus", "file": "../../../tileset/epoch/src/buildings/skyhook_terminus_128.png" },
     { "tag": "b.gaia_compact", "file": "../../../tileset/epoch/src/buildings/gaia_compact_128.png" },
-    { "tag": "b.abyssal_archive", "file": "../../../tileset/epoch/src/buildings/abyssal_archive_128.png" }
+    { "tag": "b.abyssal_archive", "file": "../../../tileset/epoch/src/buildings/abyssal_archive_128.png" },
+    { "tag": "b.gene_clinic", "file": "../../../tileset/epoch/src/buildings/gene_clinic_128.png" },
+    { "tag": "b.biosphere_dome", "file": "../../../tileset/epoch/src/buildings/biosphere_dome_128.png" },
+    { "tag": "b.cognition_hub", "file": "../../../tileset/epoch/src/buildings/cognition_hub_128.png" },
+    { "tag": "b.nanofabricator", "file": "../../../tileset/epoch/src/buildings/nanofabricator_128.png" },
+    { "tag": "b.living_arcology", "file": "../../../tileset/epoch/src/buildings/living_arcology_128.png" },
+    { "tag": "b.neural_exchange", "file": "../../../tileset/epoch/src/buildings/neural_exchange_128.png" }
   ]
 }

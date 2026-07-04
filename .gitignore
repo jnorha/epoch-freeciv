@@ -93,3 +93,6 @@ tools/art/*.tmp
 
 # Epoch — generated tileset spritesheets (binaries, tracked separately via LFS if needed)
 tileset/epoch/*.png
+
+# Art readability-gate contact sheets (regenerable artifacts)
+tileset/epoch/src/**/*_preview.png
