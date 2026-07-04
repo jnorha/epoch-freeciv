@@ -537,5 +537,255 @@ function epoch_turn_begin(turn, year)
     end
     epoch_set_era(player, maxage, "rescan")
   end
+  -- Public Works accrual rides the same (single) turn_begin handler so it can
+  -- never double-fire relative to the era rescan.
+  epoch_pw_accrue(turn)
 end
 signal.connect("turn_begin", "epoch_turn_begin")
+
+-- ------------------------------------------------------------
+-- Public Works (backlog 1.3) — pooled national build economy.
+-- Design: doc/design/feature-pw-placement.md. Gesture: the Surveyor unit
+-- (units.ruleset, UnitTypeFlag "PublicWorks") issues "User Action 3" /
+-- "Field Operation" (actions.ruleset) on an owned tile; the handler below
+-- validates and spends from the pool via edit.create_extra.
+--
+-- API verified against this build (tolua_game.pkg / tolua_server.pkg):
+--   player:cities_iterate(), city:size(), player.government:rule_name(),
+--   tile.owner / tile.terrain / tile:has_extra / tile.x / tile.y,
+--   edit.create_extra(tile, name), find.action(name), utype:has_flag(name),
+--   action_started_unit_tile(action, actor, tile).
+-- DELIBERATE DEVIATION from the design sketch: this build's Lua API exposes
+-- NO city shield/production accessor (checked tolua_game.pkg + server pkg —
+-- City has only size/tile/has_building/culture/...). Accrual therefore uses
+-- city SIZE as the base, with base_rate scaled so magnitudes match the
+-- draft's intent (a Road every turn or two for a small early empire).
+-- ------------------------------------------------------------
+
+EPOCH_CONFIG.pw = {
+  -- PW points per city-size point per turn, before the government multiplier.
+  base_rate = 10,
+  -- Keyed by government rule_name (governments.ruleset; verified list).
+  -- Intent kept from the draft: Anarchy poorest, the solarpunk/AI future
+  -- governments richest, everything else graded between.
+  gov_multipliers = {
+    ["Anarchy"]        = 0.05,
+    ["Tribal"]         = 0.07,
+    ["Despotism"]      = 0.08,
+    ["Fundamentalism"] = 0.09,
+    ["Monarchy"]       = 0.10,
+    ["Communism"]      = 0.11,
+    ["Republic"]       = 0.12,
+    ["Federation"]     = 0.13,
+    ["Democracy"]      = 0.14,
+    ["Synthesis"]      = 0.16,
+    ["Stewardship"]    = 0.18,
+  },
+  default_gov_multiplier = 0.10,
+  -- PW cost per extra (keys are exact Extra rule_names from terrain.ruleset;
+  -- "Sea Tunnel" / "Kelp Farm" contain spaces on purpose). The draft's
+  -- Farm/Forest/SolarPanel/SeaTunnel names were stale — no such extras exist.
+  improvement_costs = {
+    ["Road"]       = 10,
+    ["Railroad"]   = 25,
+    ["Mine"]       = 20,
+    ["Irrigation"] = 15,
+    ["Farmland"]   = 15,
+    ["Sea Tunnel"] = 40,
+    ["Kelp Farm"]  = 30,
+  },
+}
+
+-- Runtime state. player.id -> PW balance.
+EPOCH_STATE = { pw = {} }
+
+-- Save/load persistence: freeciv's _freeciv_state_dump (tolua_common_a.pkg)
+-- serializes only SCALAR globals (boolean/number/string/userdata) into the
+-- savegame's script.vars — tables like EPOCH_STATE are skipped. So we mirror
+-- the pool into this string ("pid:balance;pid:balance") after every mutation;
+-- on load the engine re-executes the assignment and epoch_pw_rehydrate()
+-- parses it back into EPOCH_STATE.pw before first use.
+EPOCH_PW_SAVED = ""
+
+local epoch_pw_hydrated = false
+
+local function epoch_pw_serialize()
+  local parts = {}
+  for pid, bal in pairs(EPOCH_STATE.pw) do
+    parts[#parts + 1] = tostring(pid) .. ":" .. tostring(bal)
+  end
+  EPOCH_PW_SAVED = table.concat(parts, ";")
+end
+
+local function epoch_pw_rehydrate()
+  if epoch_pw_hydrated then return end
+  epoch_pw_hydrated = true
+  if EPOCH_PW_SAVED == nil or EPOCH_PW_SAVED == "" then return end
+  local n = 0
+  for pid, bal in string.gmatch(EPOCH_PW_SAVED, "(%-?%d+):(%-?%d+)") do
+    EPOCH_STATE.pw[tonumber(pid)] = tonumber(bal)
+    n = n + 1
+  end
+  log.normal("[EPOCH][pw_load] restored " .. tostring(n)
+             .. " Public Works balances from savegame.")
+end
+
+local function epoch_pw_balance(player)
+  epoch_pw_rehydrate()
+  return EPOCH_STATE.pw[player.id] or 0
+end
+
+local function epoch_pw_gov_mult(player)
+  local gov = player.government
+  local mult = nil
+  if gov ~= nil then
+    mult = EPOCH_CONFIG.pw.gov_multipliers[gov:rule_name()]
+  end
+  return mult or EPOCH_CONFIG.pw.default_gov_multiplier
+end
+
+-- Accrual: called once per turn from epoch_turn_begin.
+function epoch_pw_accrue(turn)
+  epoch_pw_rehydrate()
+  local cfg = EPOCH_CONFIG.pw
+  for player in players_iterate() do
+    if player.is_alive then
+      local sizes = 0
+      for city in player:cities_iterate() do
+        sizes = sizes + city.size   -- property, not method, in this build
+      end
+      if sizes > 0 then
+        local mult = epoch_pw_gov_mult(player)
+        local gain = math.floor(sizes * cfg.base_rate * mult)
+        if gain > 0 then
+          EPOCH_STATE.pw[player.id] = (EPOCH_STATE.pw[player.id] or 0) + gain
+          log.normal(string.format(
+            "[EPOCH][pw_accrue] player=%d gov=%s sizes=%d gain=%d balance=%d turn=%d",
+            player.id, player.government:rule_name(), sizes, gain,
+            EPOCH_STATE.pw[player.id], turn))
+        end
+      end
+    end
+  end
+  epoch_pw_serialize()
+end
+
+-- Terrain-context improvement picker. Returns the Extra rule_name to place on
+-- this tile for this player, or nil if nothing is legal. Mirrors the extras'
+-- terrain.ruleset requirements (edit.create_extra bypasses them, so this IS
+-- the legality check). v1 auto-pick; an explicit-choice UX can come later.
+local EPOCH_PW_MINE_TERRAIN = { ["Hills"] = true, ["Mountains"] = true }
+local EPOCH_PW_FARM_TERRAIN = {
+  ["Grassland"] = true, ["Plains"] = true, ["Desert"] = true, ["Tundra"] = true,
+}
+local EPOCH_PW_OCEAN_TERRAIN = {
+  ["Ocean"] = true, ["Deep Ocean"] = true, ["Lake"] = true,
+}
+
+local function epoch_knows(player, techname)
+  local tt = find.tech_type(techname)
+  return tt ~= nil and player:knows_tech(tt)
+end
+
+function epoch_pw_pick_extra(player, tile)
+  local tname = tile.terrain:rule_name()
+  if EPOCH_PW_OCEAN_TERRAIN[tname] then
+    if epoch_knows(player, "Pressure Ecology") and not tile:has_extra("Kelp Farm")
+       and tile:city() == nil then
+      return "Kelp Farm"
+    end
+    if epoch_knows(player, "Abyssal Engineering")
+       and not tile:has_extra("Sea Tunnel") then
+      return "Sea Tunnel"
+    end
+    return nil
+  end
+  -- Land from here down.
+  if EPOCH_PW_MINE_TERRAIN[tname] and not tile:has_extra("Mine") then
+    return "Mine"
+  end
+  if EPOCH_PW_FARM_TERRAIN[tname] and not EPOCH_PW_MINE_TERRAIN[tname] then
+    if not tile:has_extra("Irrigation") then
+      return "Irrigation"
+    end
+    if not tile:has_extra("Farmland") and epoch_knows(player, "Refrigeration") then
+      return "Farmland"
+    end
+  end
+  -- General fallback: the road network.
+  if not tile:has_extra("Road") then
+    return "Road"
+  end
+  if not tile:has_extra("Railroad") and epoch_knows(player, "Railroad") then
+    return "Railroad"
+  end
+  return nil
+end
+
+-- The single server-authoritative spend path (design tenet #3): every caller
+-- (Surveyor action now, chat fallback later) funnels through here, and it
+-- re-validates everything before debiting or mutating.
+function epoch_pw_place(player, kind, tile)
+  epoch_pw_rehydrate()
+  if kind == nil or tile == nil or player == nil then return false end
+  local cost = EPOCH_CONFIG.pw.improvement_costs[kind]
+  if cost == nil then
+    log.error("[EPOCH][pw_spend] unknown improvement kind '" .. tostring(kind) .. "'")
+    return false
+  end
+  local function refuse(reason)
+    log.normal(string.format(
+      "[EPOCH][pw_refuse] player=%d kind=%s reason=%s tile=(%d,%d) turn=%d",
+      player.id, kind, reason, tile.x, tile.y, epoch_current_turn))
+  end
+  if tile.owner == nil or tile.owner.id ~= player.id then
+    refuse("not_owned")
+    notify.event(player, tile, E.SCRIPT,
+      _("Public Works: that tile is not part of your territory."))
+    return false
+  end
+  if tile:has_extra(kind) then
+    refuse("already_present")
+    notify.event(player, tile, E.SCRIPT,
+      _("Public Works: a %s is already in place there."), kind)
+    return false
+  end
+  local balance = epoch_pw_balance(player)
+  if balance < cost then
+    refuse("insufficient_funds")
+    notify.event(player, tile, E.SCRIPT,
+      _("Public Works: insufficient reserve (%d needed, %d available)."),
+      cost, balance)
+    return false
+  end
+  EPOCH_STATE.pw[player.id] = balance - cost
+  epoch_pw_serialize()
+  edit.create_extra(tile, kind)
+  log.normal(string.format(
+    "[EPOCH][pw_spend] player=%d kind=%s cost=%d tile=(%d,%d) turn=%d balance=%d",
+    player.id, kind, cost, tile.x, tile.y, epoch_current_turn,
+    EPOCH_STATE.pw[player.id]))
+  notify.event(player, tile, E.SCRIPT,
+    _("Public Works: %s commissioned (%d PW spent, %d remaining)."),
+    kind, cost, EPOCH_STATE.pw[player.id])
+  return true
+end
+
+-- Handler for the shared tiles slot. NOTE: "User Action 3" (Field Operation)
+-- is MULTIPLEXED — future special-action units (Ecoterrorist etc., see
+-- doc/design/feature-special-actions.md section 2) will also arrive on this
+-- signal with the same action. The PublicWorks-flag guard below keeps PW
+-- logic from firing for them; their handlers must guard likewise.
+function epoch_commission_works(action, actor, target_tile)
+  if action:rule_name() ~= "User Action 3" then return end
+  if not actor.utype:has_flag("PublicWorks") then return end
+  local player = actor.owner
+  local kind = epoch_pw_pick_extra(player, target_tile)
+  if kind == nil then
+    notify.event(player, target_tile, E.SCRIPT,
+      _("Public Works: nothing to build here."))
+    return
+  end
+  epoch_pw_place(player, kind, target_tile)
+end
+signal.connect("action_started_unit_tile", "epoch_commission_works")

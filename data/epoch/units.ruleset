@@ -45,6 +45,7 @@ flags =
     _("Cant_Fortify")
     _("OneAttack")
     _("NoVeteran")
+    _("PublicWorks"), _("Can commission Public Works improvements on owned tiles.")
   }
 
 ; Names for custom unit class flags. There can be up to 25 of these.
@@ -753,6 +754,54 @@ Tundra into Plains, or even Ocean into Swamp in some circumstances \
 (when on board an ocean-going vessel, on a tile surrounded by \
 sufficient existing land). See the Terrain Alterations section \
 for more details.\
+")
+
+; Epoch: Public Works pointing device (backlog 1.3). The Surveyor is a cheap
+; civilian whose only job is the "Field Operation" User Action 3 (tiles slot,
+; shared with future special-action units -- see
+; doc/design/feature-special-actions.md section 2). The PW pool logic lives in
+; script.lua (epoch_commission_works); design: doc/design/feature-pw-placement.md.
+[unit_surveyor]
+name          = _("Surveyor")
+class         = "Land"
+reqs          =
+  { "type", "name", "range"
+    "Tech", "Bronze Working", "Player"
+  }
+obsolete_by   = "None"
+graphic       = "u.worker"
+graphic_alt   = "u.engineers"
+sound_move    = "m_worker"
+sound_move_alt = "m_generic"
+sound_fight   = "f_worker"
+sound_fight_alt = "f_generic"
+build_cost    = 20
+pop_cost      = 0
+attack        = 0
+defense       = 1
+hitpoints     = 10
+firepower     = 1
+move_rate     = 2
+vision_radius_sq = 2
+transport_cap = 0
+fuel          = 0
+uk_happy      = 0
+uk_shield     = 1
+uk_food       = 0
+uk_gold       = 1
+tp_defense    = "Alight"
+flags         = "PublicWorks", "Cant_Fortify", "NonMil", "HasNoZOC", "NoVeteran"
+; No veteran levels (level name is never displayed)
+veteran_names = _("green")
+veteran_base_raise_chance = 0
+veteran_work_raise_chance = 0
+veteran_power_fact = 100
+veteran_move_bonus = 0
+helptext      = _("\
+Surveyors direct the national Public Works pool. Move a Surveyor onto or \
+next to a tile you own and order a Field Operation to commission the \
+appropriate improvement there instantly, paid for from your Public Works \
+reserve. The reserve accumulates each turn from your cities.\
 ")
 
 [unit_warriors]

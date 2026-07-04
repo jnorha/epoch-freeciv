@@ -424,6 +424,23 @@ ui_name_unit_move = _("%sKeep moving%s")
 ;user_action_1_max_range              = 3
 ;user_action_1_actor_consuming_always = FALSE
 
+; Epoch slot plan (doc/design/feature-special-actions.md section 2): there are
+; only 4 User Action slots, allocated one per target kind. Slot 3 is the SHARED
+; "tiles" slot: the Public Works Surveyor uses it today (Commission Works,
+; doc/design/feature-pw-placement.md) and future special-action units
+; (Ecoterrorist, Corporate Branch resource tap, ...) will multiplex onto it.
+; Hence the generic label; the flavor comes from the unit. Every Lua handler on
+; action_started_unit_tile MUST guard on the actor's unit-type flag.
+; NOTE: the target kind enum name in THIS build is "Tile" (actres.h
+; ATK_TILE); the sandbox ruleset's "tiles" does NOT parse and silently
+; falls back to the "Unit" default — verified the hard way.
+; /* TRANS: _Field Operation (100% chance of success). */
+ui_name_user_action_3                = _("%sField Operation%s")
+user_action_3_target_kind            = "Tile"
+user_action_3_min_range              = 0
+user_action_3_max_range              = 1
+user_action_3_actor_consuming_always = FALSE
+
 ; Some actions have a action dice roll before the action starts where it can
 ; fail. The initial probability of success is 100% unless the action appears
 ; in the following list. Then the initial probability comes from the setting
@@ -1522,4 +1539,23 @@ action        = "Gain Veterancy"
 actor_reqs    =
     { "type",         "name",      "range", "present"
       "UnitTypeFlag", "NoVeteran", "Local", FALSE
+    }
+
+; Epoch Public Works: route ONLY PublicWorks-flagged units (the Surveyor) to
+; the shared tiles slot (User Action 3, "Field Operation" -- see the slot-plan
+; comment above the user_action_3 definitions). Target must be a claimed tile
+; owned by the actor (DiplRel Foreign FALSE = target owner is not foreign).
+; The Lua handler (epoch_commission_works in script.lua) re-validates
+; ownership, pool balance and terrain legality server-side before mutating.
+[enabler_pw_commission_works]
+action        = "User Action 3"
+actor_reqs    =
+    { "type",         "name",        "range", "present"
+      "UnitTypeFlag", "PublicWorks", "Local", TRUE
+      "MinMoveFrags", "1",           "Local", TRUE
+      "DiplRel",      "Foreign",     "Local", FALSE
+    }
+target_reqs   =
+    { "type",     "name",    "range", "present"
+      "CityTile", "Claimed", "Tile",  TRUE
     }

@@ -29,6 +29,15 @@ forum threads, [Signal Tutorial](https://freeciv.fandom.com/wiki/Signal_Tutorial
 
 ---
 
+> **CORRECTION (2026-07-04, from the shipped PW build):** `target_kind` must be
+> **`"Tile"`** (singular, capitalized), NOT `"tiles"`. `"tiles"` does not parse in this
+> build — it silently falls back to the `Unit` default, so a tile-targeted `perform_action`
+> returns false with zero diagnostics. **Slot 3 is already LIVE**: the Public Works "Field
+> Operation" (User Action 3, `target_kind="Tile"`) ships in `actions.ruleset`, routed to the
+> Surveyor by `UnitTypeFlag PublicWorks`. When special-actions is built, add the Ecoterrorist/
+> Corporate-Branch enablers to the SAME slot and multiplex in the Lua handler by actor unit
+> type (the PW handler already early-returns unless the actor has the `PublicWorks` flag).
+
 ## 1. The constraint: exactly 4 User Action slots
 
 `gen_headers/enums/actions_enums.def` defines exactly `ACTION_USER_ACTION_1..4`. Their engine
@@ -54,7 +63,7 @@ disambiguated by the unit the player has in hand.
 |------|-------------|--------|------------------------------|-------------------|
 | **User Action 1** | `City`  | `action_started_unit_city` | "Civic Operation" | Cleric (convert), Corporate Branch (franchise), Televangelist (mass sermon), Slaver (raid city pop) |
 | **User Action 2** | `Unit`  | `action_started_unit_unit` | "Covert Operation" | Subverter (bribe/incite), Abolitionist (free a captured worker), Slaver (capture a worker) |
-| **User Action 3** | `tiles` | `action_started_unit_tile` | "Field Operation" | Ecoterrorist (sabotage improvement / seed pollution), Corporate Branch (resource tap) |
+| **User Action 3** | `Tile` | `action_started_unit_tile` | "Field Operation" | Ecoterrorist (sabotage improvement / seed pollution), Corporate Branch (resource tap) |
 | **User Action 4** | `Self`  | `action_started_unit_self` | "Legal Injunction" | Lawyer (place injunction — see §4) |
 
 Routing inside a handler (pattern, from the S5-proven shape):
