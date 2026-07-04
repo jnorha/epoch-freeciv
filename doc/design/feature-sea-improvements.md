@@ -104,10 +104,32 @@ regardless of underlying terrain), so no further ocean-specific risk remains; a 
 measurement is deferred to a play test. Real building is gated by the extra `reqs` (Abyssal
 Engineering + Oceanic) to an ocean-capable `Workers`-flag unit (undersea worker — see §2, TODO).
 
+### 5b. Bio-Farm shipped as a BUILDING (Aquaculture Bay), not a tile extra (✅ 2026-07-04)
+Design pivot (user's call, and the cleaner one): the "+food undersea improvement" is a **building
+that stacks on the Harbor**, not a tile extra. The shipped Harbor's food is `[effect_harbor]
+Output_Add_Tile +1 Food` gated `TerrainFlag Sea (Tile)` + `Building "Harbour" (City)` — i.e. +1
+food on *every* ocean tile the city works (the whole work radius), nothing "adjacent." So a
+second such building is a two-line clone with no unit / extra / build-action / per-tile machinery.
+
+Shipped **Aquaculture Bay** (`[building_aquaculture_bay]`, `reqs` = `Tech "Pressure Ecology"` +
+`Building "Harbour" City` + `Sea Adjacent`) with `[effect_aquaculture_bay]` = another
+`Output_Add_Tile +1 Food` on Sea tiles. It **stacks**: Harbor(+1) + Aquaculture(+1) = +2 food on
+every ocean tile worked, on top of the tile's base 1 = 3 food/ocean tile.
+
+**Empirical 3-way growth spike (Neither / Harbor / Harbor+Aquaculture):** over 44 turns,
+Neither **stalled at 3**, both food-building cities reached **6**, and Aquaculture got there
+**faster (t24 vs t32)**. Both food cities share a **size-6 ceiling because a non-food cap binds
+first** (civ2civ3 Aqueduct/happiness), so raw size can't show the extra food beyond the growth-rate
+gap. Takeaway: **the ocean-food chain removes food as the growth constraint; ultimate undersea size
+is then set by the standard, buildable Aqueduct → Sewer + happiness ladder** (all available to
+undersea cities). Aquaculture's value is faster growth + food headroom for late-game megacities,
+exactly mirroring the land Granary → Supermarket food ladder. Building vs. tile-extra trade recorded
+in `feature-ocean-cities.md` §5b (building = city-wide/zero-effort; extra = per-tile/PW-targetable).
+
 **Deferred (rest of 2.2):** Undersea Mine (Oil Platform re-gate, needs an Offshore-Platform-style
-building effect for the shield yield), **Bio-Farm** (+food — the piece that lets 2.1's undersea
-cities actually grow; needs an `Output_Inc_Tile` effect in `effects.ruleset`), Buoy re-use, the
-solarpunk arrays, and the ocean-native undersea worker unit that builds all of them.
+shield effect); a Lattice-tier ocean-food building (Deep Habitation) if more headroom is wanted;
+Buoy re-use; solarpunk arrays; the ocean-native undersea worker unit (only needed once *tile*
+extras like Sea Tunnel are built in normal play rather than via Public Works).
 
 ## 6. Open questions
 - **Sea Tunnel movement semantics:** does `causes="Road"` on ocean grant the road move bonus, or

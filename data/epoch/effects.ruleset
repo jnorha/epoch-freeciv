@@ -2107,6 +2107,19 @@ reqs    =
       "OutputType", "Food", "Local", TRUE
     }
 
+; Epoch 2.2 — Aquaculture Bay: a later "second Harbor" that stacks another +1
+; food on every ocean tile the city works. Building-based (not a tile extra),
+; so it blankets the whole work radius with no worker/placement needed.
+[effect_aquaculture_bay]
+type    = "Output_Add_Tile"
+value   = 1
+reqs    =
+    { "type", "name", "range", "present"
+      "TerrainFlag", "Sea", "Tile", TRUE
+      "Building", "Aquaculture Bay", "City", TRUE
+      "OutputType", "Food", "Local", TRUE
+    }
+
 [effect_hydro_plant]
 type    = "Output_Bonus"
 value   = 25

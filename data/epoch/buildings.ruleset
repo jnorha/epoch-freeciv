@@ -583,6 +583,35 @@ not Lakes). The city needs to be coastal (next to one of these tiles) \
 to build this improvement.\
 ")
 
+[building_aquaculture_bay]
+name		= _("Aquaculture Bay")
+genus		= "Improvement"
+reqs	=
+    { "type", "name", "range"
+      "Tech", "Pressure Ecology", "Player"
+      "Building", "Harbour", "City"
+      "TerrainFlag", "Sea", "Adjacent"
+    }
+graphic         = "b.harbor"
+graphic_alt     = "b.harbour"
+graphic_alt2    = "-"
+obsolete_by	=
+    { "type", "name", "range"
+    }
+build_cost	= 80
+upkeep		= 1
+sabotage	= 100
+sound           = "b_harbor"
+sound_alt       = "b_harbour"
+sound_alt2      = "b_generic"
+helptext	= _("\
+A Helix-age extension of the Harbor: sealed bio-reactor bays that farm the \
+water column. Adds a further food resource on every Ocean and Deep Ocean tile \
+the city works, stacking with the Harbor to push undersea (and coastal) cities \
+past their subsistence ceiling. Requires a Harbor and knowledge of Pressure \
+Ecology.\
+")
+
 [building_hydro_plant]
 name		= _("Hydro Plant")
 genus		= "Improvement"
