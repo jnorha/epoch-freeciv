@@ -2436,6 +2436,7 @@ genus		= "GreatWonder"
 reqs	=
     { "type", "name", "range"
       "Tech", "Living Architecture", "Player"
+      "Terrain", "Forest", "Adjacent"
     }
 graphic         = "b.hanging_gardens"
 graphic_alt     = "-"
@@ -2452,5 +2453,62 @@ sound_alt2      = "-"
 helptext	= _("\
 A cultivated megatree kilometres tall, its canopy a living arcology. Every \
 city in your empire grows a little more content beneath its influence, while \
-the Spire's own city blooms with luxury.\
+the Spire's own city blooms with luxury. The Spire can only be cultivated \
+beside a forest, from which its seed-stock is grown.\
+")
+
+[building_gaia_compact]
+name		= _("The Gaia Compact")
+genus		= "GreatWonder"
+; Government-gated wonder: only the Stewardship order can ratify it.
+reqs	=
+    { "type", "name", "range"
+      "Tech", "Planetary Stewardship", "Player"
+      "Gov", "Stewardship", "Player"
+    }
+graphic         = "b.hanging_gardens"
+graphic_alt     = "-"
+graphic_alt2    = "-"
+obsolete_by	=
+    { "type", "name", "range"
+    }
+build_cost	= 750
+upkeep		= 0
+sabotage	= 0
+sound		= "w_generic"
+sound_alt	= "w_generic"
+sound_alt2      = "-"
+helptext	= _("\
+A planet-wide covenant between humanity and the biosphere, ratifiable only \
+under Stewardship. Its ecological guarantees keep every city in the empire \
+healthier and more content. If the government falls, the Compact's promise \
+lapses with it.\
+")
+
+[building_abyssal_archive]
+name		= _("The Abyssal Archive")
+genus		= "GreatWonder"
+; Terrain-gated wonder: must be built in a coastal / undersea city.
+reqs	=
+    { "type", "name", "range"
+      "Tech", "Deep Habitation", "Player"
+      "TerrainClass", "Oceanic", "Adjacent"
+    }
+graphic         = "b.great_library"
+graphic_alt     = "-"
+graphic_alt2    = "-"
+obsolete_by	=
+    { "type", "name", "range"
+    }
+build_cost	= 700
+upkeep		= 0
+sabotage	= 0
+sound		= "w_generic"
+sound_alt	= "w_generic"
+sound_alt2      = "-"
+helptext	= _("\
+A knowledge vault sunk into the continental shelf, where the cold and the \
+dark preserve the recovered Soma record. It can only be raised in a city that \
+touches the sea, and it turns that city into the research heart of your \
+civilisation.\
 ")

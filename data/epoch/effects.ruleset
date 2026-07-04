@@ -2250,6 +2250,33 @@ reqs    =
       "OutputType", "Luxury", "Local"
     }
 
+; The Gaia Compact (Stewardship-gated) — empire-wide health + contentment
+[effect_gaia_compact_health]
+type    = "Health_Pct"
+value   = 30
+reqs    =
+    { "type", "name", "range"
+      "Building", "The Gaia Compact", "Player"
+    }
+
+[effect_gaia_compact_content]
+type    = "Make_Content"
+value   = 1
+reqs    =
+    { "type", "name", "range"
+      "Building", "The Gaia Compact", "Player"
+    }
+
+; The Abyssal Archive (coastal-gated) — research heart of its city
+[effect_abyssal_archive]
+type    = "Output_Bonus"
+value   = 50
+reqs    =
+    { "type", "name", "range"
+      "Building", "The Abyssal Archive", "City"
+      "OutputType", "Science", "Local"
+    }
+
 ; ---------------------------------------------------------------------------
 ; Epoch 1.7 — Future government mechanics
 ; Stewardship: ecological, high-trade, low corruption, pacifist
