@@ -2181,6 +2181,75 @@ reqs    =
       "OutputType", "Trade", "Local", TRUE
     }
 
+; ---------------------------------------------------------------------------
+; Epoch 3.1 — Diamond-age Great Wonder effects (Lattice capstones)
+; ---------------------------------------------------------------------------
+
+; The Verdant Engine — empire-wide contentment + halved population pollution
+[effect_verdant_engine_content]
+type    = "Make_Content"
+value   = 2
+reqs    =
+    { "type", "name", "range"
+      "Building", "The Verdant Engine", "Player"
+    }
+
+[effect_verdant_engine_pollution]
+type    = "Pollu_Pop_Pct"
+value   = -50
+reqs    =
+    { "type", "name", "range"
+      "Building", "The Verdant Engine", "Player"
+    }
+
+; The Ascendant Nexus — doubles research in its city
+[effect_ascendant_nexus]
+type    = "Output_Bonus"
+value   = 100
+reqs    =
+    { "type", "name", "range"
+      "Building", "The Ascendant Nexus", "City"
+      "OutputType", "Science", "Local"
+    }
+
+; Skyhook Terminus — its city becomes a trade + industry hub
+[effect_skyhook_trade]
+type    = "Output_Bonus"
+value   = 50
+reqs    =
+    { "type", "name", "range"
+      "Building", "Skyhook Terminus", "City"
+      "OutputType", "Trade", "Local"
+    }
+
+[effect_skyhook_shield]
+type    = "Output_Bonus"
+value   = 50
+reqs    =
+    { "type", "name", "range"
+      "Building", "Skyhook Terminus", "City"
+      "OutputType", "Shield", "Local"
+    }
+
+; World-Tree Spire — empire-wide contentment + luxury bloom in its city
+[effect_world_tree_content]
+type    = "Make_Content"
+value   = 1
+reqs    =
+    { "type", "name", "range"
+      "Building", "World-Tree Spire", "Player"
+    }
+
+[effect_world_tree_luxury]
+type    = "Output_Add_Tile"
+value   = 4
+reqs    =
+    { "type", "name", "range"
+      "Building", "World-Tree Spire", "City"
+      "CityTile", "Center", "Tile"
+      "OutputType", "Luxury", "Local"
+    }
+
 [effect_hydro_plant]
 type    = "Output_Bonus"
 value   = 25

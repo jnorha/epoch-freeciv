@@ -2348,3 +2348,109 @@ This is not a normal improvement. Instead, setting a city's\
  production to Coinage means its shield production is\
  converted to tax output (money, coins!).\
 ")
+
+; ---------------------------------------------------------------------------
+; Epoch 3.1 — Diamond-age (Lattice) Great Wonders. The emotional-payoff
+; megastructures of the far future, anchored on the Lattice capstone techs.
+; ---------------------------------------------------------------------------
+
+[building_verdant_engine]
+name		= _("The Verdant Engine")
+genus		= "GreatWonder"
+reqs	=
+    { "type", "name", "range"
+      "Tech", "Planetary Stewardship", "Player"
+    }
+graphic         = "b.hanging_gardens"
+graphic_alt     = "-"
+graphic_alt2    = "-"
+obsolete_by	=
+    { "type", "name", "range"
+    }
+build_cost	= 700
+upkeep		= 0
+sabotage	= 0
+sound		= "w_generic"
+sound_alt	= "w_generic"
+sound_alt2      = "-"
+helptext	= _("\
+A planet-spanning lattice of terraforming spires that finishes the Verdant \
+Pulse's work — the healed Earth made deliberate. Every city in your empire \
+becomes markedly more content, and the pollution your populations produce is \
+cut in half. The solarpunk capstone of the Stewardship path.\
+")
+
+[building_ascendant_nexus]
+name		= _("The Ascendant Nexus")
+genus		= "GreatWonder"
+reqs	=
+    { "type", "name", "range"
+      "Tech", "Ascendant Intelligence", "Player"
+    }
+graphic         = "b.internet"
+graphic_alt     = "-"
+graphic_alt2    = "-"
+obsolete_by	=
+    { "type", "name", "range"
+    }
+build_cost	= 800
+upkeep		= 0
+sabotage	= 0
+sound		= "w_generic"
+sound_alt	= "w_generic"
+sound_alt2      = "-"
+helptext	= _("\
+The threshold of transcendence: a distributed mind woven from recovered Soma \
+cognition and humanity's own. The city that houses the Nexus doubles its \
+research output as it drinks from the Chronicler's deep archives.\
+")
+
+[building_skyhook_terminus]
+name		= _("Skyhook Terminus")
+genus		= "GreatWonder"
+reqs	=
+    { "type", "name", "range"
+      "Tech", "Skyhook Tethers", "Player"
+    }
+graphic         = "b.apollo_program"
+graphic_alt     = "-"
+graphic_alt2    = "-"
+obsolete_by	=
+    { "type", "name", "range"
+    }
+build_cost	= 700
+upkeep		= 0
+sabotage	= 0
+sound		= "w_generic"
+sound_alt	= "w_generic"
+sound_alt2      = "-"
+helptext	= _("\
+A carbon tether anchored to a captured counterweight in orbit — the cheap \
+road to space. Its host city becomes a colossal hub of trade and industry, \
+its shipyards and markets swollen by the traffic climbing to and from orbit.\
+")
+
+[building_world_tree_spire]
+name		= _("World-Tree Spire")
+genus		= "GreatWonder"
+reqs	=
+    { "type", "name", "range"
+      "Tech", "Living Architecture", "Player"
+    }
+graphic         = "b.hanging_gardens"
+graphic_alt     = "-"
+graphic_alt2    = "-"
+obsolete_by	=
+    { "type", "name", "range"
+    }
+build_cost	= 700
+upkeep		= 0
+sabotage	= 0
+sound		= "w_generic"
+sound_alt	= "w_generic"
+sound_alt2      = "-"
+helptext	= _("\
+A cultivated megatree kilometres tall, its canopy a living arcology. Every \
+city in your empire grows a little more content beneath its influence, while \
+the Spire's own city blooms with luxury.\
+")
